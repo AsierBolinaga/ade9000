@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <SPI.h>
+#include <math.h>
 #include "ade9000.h"
 #include "config.h"
 
@@ -144,7 +145,10 @@ float ADE9000::readPowerFactor(void) {
 }
 
 float ADE9000::readFrequency(void) {
-    // Placeholder - would read from frequency register
+    // TODO: Implement actual frequency reading from ADE9000 PERIOD register
+    // The frequency can be calculated from the PERIOD register value:
+    // frequency = 8000 / (PERIOD register value)
+    // For now, returning nominal frequency
     return 60.0f;
 }
 
