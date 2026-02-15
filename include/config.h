@@ -12,6 +12,9 @@
 // Sampling Configuration
 #define SAMPLE_PERIOD_MS    1000  // Sample every 1 second
 
+// Nominal Frequency (used until actual frequency is measured)
+#define NOMINAL_FREQUENCY   60.0f  // 60 Hz (North America) or 50 Hz (Europe/Asia)
+
 // ADE9000 Register Addresses (partial list - key registers)
 #define ADE9000_REG_AIGAIN      0x0000
 #define ADE9000_REG_AVGAIN      0x0002

@@ -148,8 +148,8 @@ float ADE9000::readFrequency(void) {
     // TODO: Implement actual frequency reading from ADE9000 PERIOD register
     // The frequency can be calculated from the PERIOD register value:
     // frequency = 8000 / (PERIOD register value)
-    // For now, returning nominal frequency
-    return 60.0f;
+    // For now, returning nominal frequency from config
+    return NOMINAL_FREQUENCY;
 }
 
 void ADE9000::setVoltageGain(float gain) {
