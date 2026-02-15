@@ -1,0 +1,11 @@
+digraph "led_thread"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="led_thread",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Structure that combines both configuration and data for the LED thread."];
+  Node2 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" led_thread_config" ,fontname="Helvetica"];
+  Node2 [label="led_thread_config_t",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$d8/dc3/structled__thread__config__t.html",tooltip="Configuration structure passed to the LED handler during initialization."];
+  Node3 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" led_thread_data" ,fontname="Helvetica"];
+  Node3 [label="led_thread_data_t",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$db/db0/structled__thread__data__t.html",tooltip="LED data structure passed to the LED handler during initialization."];
+}

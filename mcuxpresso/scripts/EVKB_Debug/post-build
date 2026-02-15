@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# shellcheck disable=SC2154
+arm-none-eabi-size "${BuildArtifactFileName}"
+arm-none-eabi-objcopy -v -O ihex "${BuildArtifactFileName}" "${BuildArtifactFileBaseName}.hex"
+arm-none-eabi-objcopy -v -O binary "${BuildArtifactFileName}" "${BuildArtifactFileBaseName}.bin"
+checksum -p "${TargetChip}" -d "${BuildArtifactFileBaseName}.bin"

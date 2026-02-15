@@ -1,8 +1,8 @@
-# ADE900 Data Extractor
+# ADE9000 Data Extractor
 
-This repository contains the code for **ADE900 Data Extractor**. This firmware is intended to run on the **i.MXRT1062** microcontroller.
+This repository contains the code for **ADE9000 Data Extractor**. This firmware is intended to run on the **i.MXRT1062** microcontroller.
 
-It is a sensor that monitors electrical installations, using Analog Devices’ energy-metering IC, the **ADE9000**, as the system’s energy-measurement component. The ADE900 Data Extractor firmware reads variables from the ADE9000 and sends them over Ethernet—either via **UDP** or **TCP**—to the computing node.
+It is a sensor that monitors electrical installations, using Analog Devices’ energy-metering IC, the **ADE90000**, as the system’s energy-measurement component. The ADE9000 Data Extractor firmware reads variables from the ADE90000 and sends them over Ethernet—either via **UDP** or **TCP**—to the computing node.
 
 Two types of variables are read. We call these types **services**:
 - fast variables (**raw**)
@@ -10,7 +10,7 @@ Two types of variables are read. We call these types **services**:
 
 - **raw**: The sensor streams in real time the installation’s voltage, current, and power values. It can be configured to send all or only some of the fast variables. This configuration is done via MQTT.
 
-- **registers**: There are multiple ADE9000 registers that can be read, either to monitor their values or to diagnose whether the ADE900 Data Extractor sensor is correctly connected. They are read from the ADE9000 and sent to the computing node every 1.5 seconds. As with the raw variables, this configuration is done via MQTT. (See the internal document **Slow_Vars.pdf** for details.)
+- **registers**: There are multiple ADE90000 registers that can be read, either to monitor their values or to diagnose whether the ADE9000 Data Extractor sensor is correctly connected. They are read from the ADE90000 and sent to the computing node every 1.5 seconds. As with the raw variables, this configuration is done via MQTT. (See the internal document **Slow_Vars.pdf** for details.)
 
 The **MQTT** protocol is documented in the **sensor-api** repository (internal).
 
@@ -44,7 +44,7 @@ When building, only the **.axf** file required for debugging is generated. You o
 
 ### ADSN
 
-This profile is implemented as the **release** version of **ADE900 Data Extractor**.
+This profile is implemented as the **release** version of **ADE9000 Data Extractor**.
 
 In this case, two binaries are generated:
 
@@ -77,7 +77,7 @@ The firmware architecture is represented in the following image.
 
 ![](./doc/images/Energy%20freerun%20Architecture.png)
 
-The items shown in gray are external elements—i.e., external modules that our system uses, but which are not code implemented specifically for **ADE900 Data Extractor**, such as the operating system or microcontroller drivers.
+The items shown in gray are external elements—i.e., external modules that our system uses, but which are not code implemented specifically for **ADE9000 Data Extractor**, such as the operating system or microcontroller drivers.
 
 Everything inside the blue box is code implemented for this project. This contains all sensor logic and functionality. It was designed to be independent from external modules so that if something external changes (for example, replacing the OS), it should not affect the application code—or, at worst, it would only affect a small part outside the **“platform independent”** box.
 
@@ -88,7 +88,7 @@ The idea is that the **APP** always calls functions from the **portability layer
 The folder structure was built to follow the firmware architecture:
 
 - **doc**: Documentation files.
-- **energy_freerun**: All **ADE900 Data Extractor** functionality.
+- **energy_freerun**: All **ADE9000 Data Extractor** functionality.
 - **mcuxpresso**: Files required for the **MCUXpresso** project and project-specific code.
 - **portability_layer**: The portability layer.
 - **platform**: Operating system, drivers, and any external modules used by the project.
@@ -100,7 +100,7 @@ This folder contains the **Energy Freerun** logic. The code in this folder shoul
 
 At the top level is the system core, which contains the system intelligence and everything needed to integrate the different modules and threads.
 
-Each subfolder is a thread or module used by ADE900 Data Extractor, but in theory they could work on any other device that requires the same functionality. The top level also includes everything needed to configure the threads/modules used and to manage the different **ADE900 Data Extractor** states.
+Each subfolder is a thread or module used by ADE9000 Data Extractor, but in theory they could work on any other device that requires the same functionality. The top level also includes everything needed to configure the threads/modules used and to manage the different **ADE9000 Data Extractor** states.
 
 ## System handler
 
@@ -145,12 +145,12 @@ These are the possible alert types:
 | 3 | Invalid domain specified trying to give an alert. | Warning |
 | 4 | Watchdog reset detected on system startup. | Warning |
 | 5 | Too much time without IRQ, energy sensor will be reconfigured and restarted. | Warning |
-| 6 | ADE9000 reconfiguration error. | Error |
-| 7 | ADE9000 register read error. | Error |
-| 8 | ADE9000 register write error. | Error |
-| 9 | ADE9000 burst error. | Error |
-| 10 | ADE9000 too much time between waveform data reads detected, possible data lost. | Warning |
-| 11 | ADE9000 too much time between registers reads detected, possible data lost. | Warning |
+| 6 | ADE90000 reconfiguration error. | Error |
+| 7 | ADE90000 register read error. | Error |
+| 8 | ADE90000 register write error. | Error |
+| 9 | ADE90000 burst error. | Error |
+| 10 | ADE90000 too much time between waveform data reads detected, possible data lost. | Warning |
+| 11 | ADE90000 too much time between registers reads detected, possible data lost. | Warning |
 | 12 | Time synchronized timeout. System time not updated. | Warning |
 | 13 | FW update done. | Info |
 | 14 | No FW update detected. | Info |
@@ -160,17 +160,17 @@ These are the possible alert types:
 | 18 | Error sending discovery. | Error |
 | 19 | Error sending status. | Error |
 | 20 | Received mqtt command is unknown or has an incorrect payload data. | Warning |
-| 21 | ADE9000 reset configuration command cannot be used when the sensor is not configured. | Warning |
+| 21 | ADE90000 reset configuration command cannot be used when the sensor is not configured. | Warning |
 | 22 | Start command cannot be used when the sensor is not configured. | Warning |
 | 23 | Stop command cannot be used when the sensor is not configured. | Warning |
 | 24 | Complete update received without going to fw update state. | Error |
-| 25 | ADE9000 has been reconfigured. | Info |
+| 25 | ADE90000 has been reconfigured. | Info |
 | 26 | Error getting mqtt command. | Error |
 | 27 | Received fundamental frequency is invalid. It should be 50 or 60 Hz. | Warning |
-| 28 | Value was not written in register. Make sure that the ADE9000 is correctly connected. | Warning |
+| 28 | Value was not written in register. Make sure that the ADE90000 is correctly connected. | Warning |
 | 29 | Received hw config is invalid. | Warning |
 | 30 | Received TC values are invalid. Make sure that configured TC values are not 0. | Warning |
-| 31 | ADE9000 irq not working. | Error |
+| 31 | ADE90000 irq not working. | Error |
 | 32 | Configured protocol is unknown or not supported. | Warning |
 | 33 | Configured format is unknown or not supported. | Warning |
 | 34 | UDP data could not be sent. | Warning |
@@ -289,9 +289,9 @@ These are the possible alert types:
 
 During initialization, the **system handler** passes the pointer to the global state to each thread, so that each thread can behave differently in each state, depending on how it is configured. Each thread is configured by the system handler, and the configuration of each thread/module is explained in the specific documentation found in its folder.
 
-Energy thread: Thread that configures and handles ADE9000 interrupts. Depending on which ADE9000 services are active (fast variables “RAW” or slow variables “registers”), it sends the necessary events so that the variable-reading threads run after each interrupt.
+Energy thread: Thread that configures and handles ADE90000 interrupts. Depending on which ADE90000 services are active (fast variables “RAW” or slow variables “registers”), it sends the necessary events so that the variable-reading threads run after each interrupt.
 
-Vars reading: Thread responsible for reading sensor variables (i.e., from the ADE9000) and sending data to the streaming thread. There is one instance per system service: one for fast variables and another for slow variables.
+Vars reading: Thread responsible for reading sensor variables (i.e., from the ADE90000) and sending data to the streaming thread. There is one instance per system service: one for fast variables and another for slow variables.
 
 Commands thread: Thread that sends, receives, and parses MQTT commands.
 
@@ -319,7 +319,7 @@ Led handler: Thread responsible for blinking the LED with the pattern configured
 - Error state: Fast continuous blink, 50 ms on and 50 ms off.
 - FW update: Continuous blink, 300 ms on and 700 ms off (due to flash writes, on/off times may become longer).
 
-Streaming: Thread responsible for sending via UDP the data obtained from the ADE9000. There is one instance per system service: one for fast variables and another for slow variables.
+Streaming: Thread responsible for sending via UDP the data obtained from the ADE90000. There is one instance per system service: one for fast variables and another for slow variables.
 
 Timesync: Thread that synchronizes the system clock via NTP.
 
@@ -327,7 +327,7 @@ Watchdog: Module responsible for the system watchdog.
 
 ## Abstraction layer
 
-This is the firmware’s abstraction layer. The **ADE900 Data Extractor** firmware should not require any changes if the operating system or microcontroller changes, as long as everything required for the new platform is implemented in th abstraction layer. If not, the missing parts must be implemented in abstraction layer, but the firmware should remain unchanged.
+This is the firmware’s abstraction layer. The **ADE9000 Data Extractor** firmware should not require any changes if the operating system or microcontroller changes, as long as everything required for the new platform is implemented in th abstraction layer. If not, the missing parts must be implemented in abstraction layer, but the firmware should remain unchanged.
 
 The only project-dependent parts that would change are the abstraction layer configuration files: **pl_config.h** and **pl_hw_config.c/h**.
 

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [ -z "${ProjDirTopLevel}" ] ; then
+    script_dir=$(readlink -f "$0")
+    script_dir="${script_dir%/*}"
+    cd "${script_dir}" || exit 1
+    ProjDirTopLevel="$(git rev-parse --show-toplevel)"
+fi
+
+if [ ! -e "${ProjDirTopLevel}/.git/hooks/pre-push" ] ; then
+    ln -s ../../scripts/git-hooks/pre-push "${ProjDirTopLevel}/.git/hooks/pre-push"
+fi

@@ -1,0 +1,10 @@
+.vscode/
+CMakeList.txt
+bin/
+energy_freerun/energy_fw_version.h
+**/*.pyc
+**/*.launch
+**/language.settings.xml
+version.txt
+.firmware.version.txt
+**/*.jlink

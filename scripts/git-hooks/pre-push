@@ -1,0 +1,90 @@
+#!/bin/bash
+
+
+# Extract last commit in api code
+# Extract validated commit from submodule
+
+show_doc_verified_api_code()
+{
+	local docpath="$1"
+
+	# shellcheck disable=SC2016
+	git submodule --quiet foreach "
+		if [ "'"$sm_path"'" = ""$docpath"" ] ; then
+			git show "'"${sha1}"'":verified_srcrevs.json ;
+		fi
+	"
+}
+
+ProjDirTopLevel="$(git rev-parse --show-toplevel)"
+docpath="doc/sensor-api"
+
+if [ ! -e "${ProjDirTopLevel}/${docpath}" ]  ; then
+	echo "hook error: could not find \"${ProjDirTopLevel}/${docpath}\" directory" >&2
+	exit 1
+fi
+
+verified_srcrevs="$(show_doc_verified_api_code "$docpath" 2>/dev/null)"
+if [ -z "$verified_srcrevs" ] ; then
+	echo "ERROR: Could not find doc submodule verification file" >&2
+	exit 1
+fi
+
+remoteURL="$(git remote -v | grep origin | head -n1 | awk '{print $2}')"
+if [ -z "$remoteURL" ] ; then
+	echo "ERROR: Could not find project URL" >&2
+	exit 1
+fi
+
+nurls="$(echo "$verified_srcrevs" | jq """.repos | length""")"
+if [ ! "$nurls" -ge "1" ] ; then
+	echo "ERROR: No verification paths found in ${ProjDirTopLevel}/${docpath}" >&2
+	exit 1
+fi
+
+repoFound="no"
+
+# shellcheck disable=SC2086
+for irepo in $(seq 0 $((nurls-1))) ; do
+	if echo "$verified_srcrevs" | jq ".repos[$irepo]".urls | grep -q "$remoteURL" ; then
+		repoFound="yes"
+		npaths="$(echo "$verified_srcrevs" | jq """.repos[$irepo].paths | length""")"
+		if [ ! "$npaths" -ge "1" ] ; then
+			echo "ERROR: No verification paths found in ${ProjDirTopLevel}/${docpath}" >&2
+			exit 1
+		fi
+		for ipath in $(seq 0 $((npaths-1))) ; do
+			chkpath="$(echo "$verified_srcrevs" | jq -r """.repos[$irepo].paths[$ipath].path""")"
+			if [ -z "$chkpath" ] ; then
+				echo "ERROR: path not found in ${ipath}-th element in ${ProjDirTopLevel}/${docpath}" >&2
+				exit 1
+			fi
+			chkpath="${ProjDirTopLevel}/${chkpath}"
+			if [ ! -e "$chkpath" ] ; then
+				echo "ERROR: $chkpath not found" >&2
+				exit 1
+			fi
+			current_srcrev="$(git log -n 1 --pretty=format:"%H" -- "${chkpath}")"
+			if [ -z "$current_srcrev" ] ; then
+				echo "ERROR: Couldn't find last git version of ${chkpath}" >&2
+				exit 1
+			fi
+			expected_srcrev="$(echo "$verified_srcrevs" | jq -r "".repos[$irepo].paths[$ipath].srcrev"")"
+			if [ -z "$expected_srcrev" ] ; then
+				echo "ERROR: Couldn't find expected git version of ${chkpath}" >&2
+				exit 1
+			fi
+			if [ "$current_srcrev" != "$expected_srcrev" ] ; then
+				echo "ERROR: Mismatch between code and documentation. Please review." >&2
+				exit 1
+			fi
+		done
+	fi
+done
+
+if [ "$repoFound" != "yes" ] ; then
+	echo "ERROR: API definition path doesn't support this repo origin URL" >&2
+	exit 1
+fi
+
+exit 0

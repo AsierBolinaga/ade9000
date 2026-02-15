@@ -1,0 +1,7 @@
+#!/bin/bash
+
+PRJ_TOPDIR="${PWD}/../.."
+
+mv "${PRJ_TOPDIR}/bin/ADSN_energy_freerun.bin" "${PRJ_TOPDIR}/bin/ADSN_energy_freerun-$(cat "${PRJ_TOPDIR}/.firmware.version.txt").bin"
+mv "${PRJ_TOPDIR}/bin/boot_ADSN_energy_freerun.bin" "${PRJ_TOPDIR}/bin/boot_ADSN_energy_freerun-$(cat "${PRJ_TOPDIR}/.firmware.version.txt").bin"
+mv "${PRJ_TOPDIR}/bin/boot_ADSN_energy_freerun.hex" "${PRJ_TOPDIR}/bin/boot_ADSN_energy_freerun-$(cat "${PRJ_TOPDIR}/.firmware.version.txt").hex"

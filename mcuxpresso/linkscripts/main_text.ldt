@@ -1,0 +1,1 @@
+        *(EXCLUDE_FILE(*flexspi_nor_flash_ops.o *fsl_flexspi.o *system_handler.o *ade9000.o) .text*)

@@ -1,0 +1,45 @@
+#!/bin/bash
+
+#Expected tag format (in git repository):
+# 0.0.0+alpha1
+#Expected version format examples for get_version_from_git():
+# 0.0.0+alpha1+d20141203
+# 0.0.0+alpha0.645.gb7c11ab+d20141203
+#
+
+PRJ_TOPDIR="${PWD}/../.."
+
+# Test environment
+if [ -z "${PRJ_TOPDIR}" ] ; then
+    echo "ERROR: PRJ_TOPDIR variable should be defined. Make sure development environment is loaded" >&2
+    exit 2
+fi
+
+cd "${PRJ_TOPDIR}" || { echo "Couldn't find project top directory ${PRJ_TOPDIR}" >&2 ; exit 2 ; }
+SW_VERSION="$(git describe --tags | sed 's/-/./g' || echo ERROR)"
+if [ "${SW_VERSION}" = "ERROR" ] || ! git describe --tags >/dev/null 2>/dev/null ; then
+    echo "Unexpected error while extracting system version. Please check that the project is already tagged." >&2
+    exit 2
+fi
+# shellcheck disable=SC2046
+if [ $(git status -s | wc -l) -ne 0 ] ; then
+    SW_VERSION="${SW_VERSION}mod"
+fi
+SW_VERSION="${SW_VERSION}+d$(date -d "$(git show -s --format=%ci)" "+%Y%m%d")"
+echo "${SW_VERSION}" | tee "${PRJ_TOPDIR}/.firmware.version.txt"
+
+cat << EOF > "${PRJ_TOPDIR}/energy_freerun/energy_fw_version.h"
+/*
+ * energy_fw_version.h
+ *
+ *  Created on: Nov 9, 2023
+ *      Author: abolinaga
+ */
+
+#ifndef ENERGY_FW_VERSION_H_
+#define ENERGY_FW_VERSION_H_
+
+#define ENERGY_FW_VERSION	"${SW_VERSION}"
+
+#endif /* ENERGY_FW_VERSION_H_ */
+EOF
