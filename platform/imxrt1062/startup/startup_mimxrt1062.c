@@ -9,9 +9,9 @@
 //
 // SPDX-License-Identifier: BSD-3-Clause
 //*****************************************************************************
-#include "pl_types.h"
+#include "absl_types.h"
 
-#include "pl_system.h"
+#include "absl_system.h"
 
 #if defined (DEBUG)
 #pragma GCC push_options
@@ -745,47 +745,47 @@ void ResetISR(void) {
 //*****************************************************************************
 WEAK_AV void NMI_Handler(void)
 {
-	pl_hardfault_handler(NMI_HARDFAULT_ERROR);
+	absl_hardfault_handler(NMI_HARDFAULT_ERROR);
 }
 
 WEAK_AV void HardFault_Handler(void)
 {
-	pl_hardfault_handler(HARDFAULT_ERROR);
+	absl_hardfault_handler(HARDFAULT_ERROR);
 }
 
 WEAK_AV void MemManage_Handler(void)
 {
-	pl_hardfault_mem_man();
+	absl_hardfault_mem_man();
 }
 
 WEAK_AV void BusFault_Handler(void)
 {
-	pl_hardfault_bus();
+	absl_hardfault_bus();
 }
 
 WEAK_AV void UsageFault_Handler(void)
 {
-	pl_hardfault_usage();
+	absl_hardfault_usage();
 }
 
 WEAK_AV void SVC_Handler(void)
 {
-	pl_hardfault_handler(SVC_HARDFAULT_ERROR);
+	absl_hardfault_handler(SVC_HARDFAULT_ERROR);
 }
 
 WEAK_AV void DebugMon_Handler(void)
 {
-	pl_hardfault_handler(DEBUGMON_HARDFAULT_ERROR);
+	absl_hardfault_handler(DEBUGMON_HARDFAULT_ERROR);
 }
 
 WEAK_AV void PendSV_Handler(void)
 {
-	pl_hardfault_handler(PEND_SV_HARDFAULT_ERROR);
+	absl_hardfault_handler(PEND_SV_HARDFAULT_ERROR);
 }
 
 WEAK_AV void SysTick_Handler(void)
 {
-	pl_hardfault_handler(SYSTICK_HARDFAULT_ERROR);
+	absl_hardfault_handler(SYSTICK_HARDFAULT_ERROR);
 }
 
 //*****************************************************************************
@@ -794,7 +794,7 @@ WEAK_AV void SysTick_Handler(void)
 //*****************************************************************************
 WEAK_AV void IntDefaultHandler(void)
 {
-	pl_hardfault_handler(INT_HANDLER_HARDFAULT_ERROR);
+	absl_hardfault_handler(INT_HANDLER_HARDFAULT_ERROR);
 }
 
 //*****************************************************************************

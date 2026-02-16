@@ -10,9 +10,9 @@
 #include "fsl_iomuxc.h"
 #include "fsl_enet.h"
 
-#include "pl_macros.h"
+#include "absl_macros.h"
 
-ALLOC_DATA_SEC phy_ksz8081_resource_t g_phy_resource;
+phy_ksz8081_resource_t g_phy_resource;
 
 static void MDIO_Init(void)
 {

@@ -1,0 +1,3 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/energy/energy.c:153:13:energy_read_vars_event_timeout_cb	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/energy/energy.c:69:6:energy_task_initialize	40	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/energy/energy.c:108:6:energy_task	48	static

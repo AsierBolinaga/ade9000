@@ -12,11 +12,11 @@
 #ifndef LED_HANDLER_H_
 #define LED_HANDLER_H_
 
-#include "pl_types.h"
+#include "absl_types.h"
 
-#include "pl_gpio.h"
-#include "pl_timer.h"
-#include "pl_event.h"
+#include "absl_gpio.h"
+#include "absl_timer.h"
+#include "absl_event.h"
 
 /******************************************************************************
  * Type definitions
@@ -73,9 +73,9 @@ typedef struct led_pattern
  */
 typedef struct led_thread_data
 {
-	pl_gpio_t		status_led_user_gpio;				///< GPIO object for the status LED
-	pl_timer_t      led_toggle_timer;			 		///< Timer used to toggle the LED
-	pl_event_t      led_toggle_event;			 		///< Event used to trigger LED toggle
+	absl_gpio_t		status_led_user_gpio;				///< GPIO object for the status LED
+	absl_timer_t      led_toggle_timer;			 		///< Timer used to toggle the LED
+	absl_event_t      led_toggle_event;			 		///< Event used to trigger LED toggle
 	led_pattern_t*  led_pattern;				 		///< Currently active LED blinking pattern
 }led_thread_data_t;
 

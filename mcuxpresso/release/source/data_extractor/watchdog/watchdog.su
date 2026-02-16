@@ -1,0 +1,6 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/watchdog/watchdog.c:120:13:watchdog_thread_check_cb	32	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/watchdog/watchdog.c:39:6:watchdog_init	64	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/watchdog/watchdog.c:71:6:watchdog_run	8	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/watchdog/watchdog.c:81:6:watchdog_disable	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/watchdog/watchdog.c:86:6:watchdog_reset	8	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/watchdog/watchdog.c:93:6:watchdog_task	16	static

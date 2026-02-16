@@ -7,8 +7,8 @@
 
 #include "event_handler.h"
 
-#include "pl_time.h"
-#include "pl_debug.h"
+#include "absl_time.h"
+#include "absl_debug.h"
 
 #define ERROR_CODE_ARRAY_NUMBER 	SENSOR_MAXVALUE + SERVICE_MAXVALUE + 1
 #define ERROR_CODES_SYSTEM			SENSOR_MAXVALUE + SERVICE_MAXVALUE
@@ -30,9 +30,9 @@ static uint32_t	last_alert_code;
 static uint64_t	last_alert_time;
 
 static sensor_config_t* 	sensors_cfg;
-static pl_event_t* 	 		system_events_group;
+static absl_event_t* 	 		system_events_group;
 static uint32_t 			task_event_or_error_mask;
-static pl_queue_t*			event_queue;
+static absl_queue_t*			event_queue;
 
 static void event_handler_new_error(uint32_t _error_index, error_code_t* _error_code);
 
@@ -45,7 +45,7 @@ static error_code_t eh_error_description[EH_ERROR_CODE_MAX_VALUE] =
 	{CODE_INVALID_SENSOR_SERVICE,	"Errors list has been corrupted, no error info available."}
 };
 
-void event_handler_init(sensor_config_t* _sensors_cfg, pl_event_t* _system_events_group, uint32_t _task_event_or_error_mask, pl_queue_t* _event_queue)
+void event_handler_init(sensor_config_t* _sensors_cfg, absl_event_t* _system_events_group, uint32_t _task_event_or_error_mask, absl_queue_t* _event_queue)
 {
 	sensors_cfg = _sensors_cfg;
 	system_events_group = _system_events_group;
@@ -70,8 +70,8 @@ event_data_to_send_t event_handler_new_event_code(event_info_t* _event)
 
 		if(EVENT_TYPE_ERROR != _event->event_type)
 		{
-			pl_time_t timestamp = pl_time_gettime();
-			event_data.data.alert_data.time = pl_time_to_us(timestamp);
+			absl_time_t timestamp = absl_time_gettime();
+			event_data.data.alert_data.time = absl_time_to_us(timestamp);
 			if((last_alert_code == _event->error_code->error_code_num) &&
 			   (1000000 > (event_data.data.alert_data.time - last_alert_time)))
 			{
@@ -220,8 +220,8 @@ void event_handler_notify_system_event(void* _events_info, uint32_t _event)
 
 	if(EVENT_TYPE_NONE != events_info[_event].event_type)
 	{
-		pl_event_set(system_events_group, task_event_or_error_mask);
-		pl_queue_send(event_queue, (void*)&events_info[_event], PL_QUEUE_NO_DELAY);
+		absl_event_set(system_events_group, task_event_or_error_mask);
+		absl_queue_send(event_queue, (void*)&events_info[_event], ABSL_QUEUE_NO_DELAY);
 	}
 }
 

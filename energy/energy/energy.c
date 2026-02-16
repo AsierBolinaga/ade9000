@@ -9,12 +9,12 @@
 
 #include "interfaces.h"
 
-#include "pl_debug.h"
-#include "pl_time.h"
-#include "pl_timer.h"
-#include "pl_thread.h"
-#include "pl_system.h"
-#include "pl_macros.h"
+#include "absl_debug.h"
+#include "absl_time.h"
+#include "absl_timer.h"
+#include "absl_thread.h"
+#include "absl_system.h"
+#include "absl_macros.h"
 
 /*******************************************************************************
  * type definitions
@@ -50,8 +50,8 @@ static energy_task_normal_states_t	energy_normal_state;
 //static transmission_config_t	power_vars_transmission;
 //static power_vars_config_t 		power_vars_config;
 
-static pl_timer_t	read_vars_event_timer;
-static pl_time_t	read_vars_timeout;
+static absl_timer_t	read_vars_event_timer;
+static absl_time_t	read_vars_timeout;
 static uint32_t		event_timeout_error_count;
 
 /*******************************************************************************
@@ -78,14 +78,14 @@ bool energy_task_initialize(energy_thread_config_t* _energy_task_config)
 	{
 		energy_config = _energy_task_config;
 
-		if(PL_EVENT_RV_OK == pl_event_create(energy_config->energy_events))
+		if(ABSL_EVENT_RV_OK == absl_event_create(energy_config->energy_events))
 		{
 			if(energy_init(energy_config->energy_sensor_conf, energy_config->energy_events,
 					       ENERGY_READ_FAST_VARIABLES, ENERGY_READ_SLOW_VARIABLES))
 			{
 				read_vars_timeout.seconds = 0;
 				read_vars_timeout.nseconds = energy_config->time_between_vars_read_events_ms * 1000000;
-				pl_timer_create(&read_vars_event_timer, &energy_read_vars_event_timeout_cb, NULL,
+				absl_timer_create(&read_vars_event_timer, &energy_read_vars_event_timeout_cb, NULL,
 								read_vars_timeout, false, false);
 
 				energy_normal_state = ENERGY_TASK_NORMAL_STATE_CONFIGURE;
@@ -114,13 +114,13 @@ void energy_task(void* arg)
 
 	if(!energy_config->energy_initialized)
 	{
-		pl_debug_printf("Energy task was not initialized!\n");
-		pl_hardfault_handler(THREAD_NOT_INIT_ERROR);
+		absl_debug_printf("Energy task was not initialized!\n");
+		absl_hardfault_handler(THREAD_NOT_INIT_ERROR);
 	}
 
 	while(1)
 	{
-		if(PL_EVENT_RV_OK == pl_event_wait(energy_config->energy_events, ENERGY_EVENTS, &event_flags))
+		if(ABSL_EVENT_RV_OK == absl_event_wait(energy_config->energy_events, ENERGY_EVENTS, &event_flags))
 		{
 			energy_state = energy_config->sensor_to_task_state[*system_state];
 			switch(energy_state)
@@ -134,22 +134,22 @@ void energy_task(void* arg)
 			case ENERGY_TASK_STATE_ERROR:
 				break;
 			default:
-				pl_hardfault_handler(UNKNOWN_SWITCH_CASE_ERROR);
+				absl_hardfault_handler(UNKNOWN_SWITCH_CASE_ERROR);
 				break;
 			}
 		}
 		else
 		{
-			pl_hardfault_handler(UNKNOWN_EVENT_ERROR);
+			absl_hardfault_handler(UNKNOWN_EVENT_ERROR);
 		}
 	}
 }
 
 static void energy_read_vars_event_timeout_cb(void* arg)
 {
-	PL_UNUSED_ARG(arg);
+	ABSL_UNUSED_ARG(arg);
 
-	pl_event_set_fromISR(energy_config->energy_events, ENERGY_READ_VARS_TIMEOUT);
+	absl_event_set_fromISR(energy_config->energy_events, ENERGY_READ_VARS_TIMEOUT);
 }
 
 static void energy_task_idle_state(uint32_t _events)
@@ -175,19 +175,19 @@ static void energy_task_idle_state(uint32_t _events)
 		obtain_fast_vars = false;
 		energy_clear_waveform();
 
-		pl_event_set(energy_config->fast_vars_stream_events, energy_config->stream_disconnect);
+		absl_event_set(energy_config->fast_vars_stream_events, energy_config->stream_disconnect);
 	}
 	if(ENERGY_STOP_SLOW_VARS == (_events & ENERGY_STOP_SLOW_VARS))
 	{
 		obtain_slow_vars = false;
 		energy_clear_slow_vars();
 
-		pl_event_set(energy_config->slow_vars_stream_events, energy_config->stream_disconnect);
+		absl_event_set(energy_config->slow_vars_stream_events, energy_config->stream_disconnect);
 	}
 	if(ENERGY_CONFIG_RESET ==(_events & ENERGY_CONFIG_RESET))
 	{
 		energy_normal_state = ENERGY_TASK_NORMAL_STATE_CONFIGURE;
-		pl_event_set(energy_config->system_events, energy_config->reconfig_event);
+		absl_event_set(energy_config->system_events, energy_config->reconfig_event);
 	}
 }
 
@@ -203,7 +203,7 @@ static void energy_task_normal_state(uint32_t _events)
 		energy_task_running_state(_events);
 		break;
 	default:
-		pl_hardfault_handler(UNKNOWN_SWITCH_CASE_ERROR);
+		absl_hardfault_handler(UNKNOWN_SWITCH_CASE_ERROR);
 		break;
 	}
 }
@@ -235,7 +235,7 @@ static void energy_task_configure_state(uint32_t _events)
 			}
 
 			energy_normal_state = ENERGY_TASK_NORMAL_STATE_RUNNING;
-			pl_event_set(energy_config->system_events, event_to_send);
+			absl_event_set(energy_config->system_events, event_to_send);
 		}
 	}
 	if(ENERGY_READ_FAST_VARIABLES == (_events & ENERGY_READ_FAST_VARIABLES))
@@ -287,7 +287,7 @@ static void energy_task_running_state(uint32_t _events)
 		if(obtain_fast_vars)
 		{
 			energy_enable_data_obtaining_fast();
-			pl_event_set(energy_config->fast_vars_events, energy_config->vars_read);
+			absl_event_set(energy_config->fast_vars_events, energy_config->vars_read);
 		}
 	}
 	if(ENERGY_READ_SLOW_VARIABLES == (_events & ENERGY_READ_SLOW_VARIABLES))
@@ -295,7 +295,7 @@ static void energy_task_running_state(uint32_t _events)
 		if(obtain_slow_vars)
 		{
 			energy_enable_data_obtaining_slow();
-			pl_event_set(energy_config->slow_vars_events, energy_config->vars_read);
+			absl_event_set(energy_config->slow_vars_events, energy_config->vars_read);
 		}
 	}
 	if(ENERGY_START_FAST_VARS == (_events & ENERGY_START_FAST_VARS))
@@ -304,7 +304,7 @@ static void energy_task_running_state(uint32_t _events)
 		{
 			energy_clear_waveform();
 
-			pl_event_set(energy_config->fast_vars_stream_events, energy_config->stream_connect);
+			absl_event_set(energy_config->fast_vars_stream_events, energy_config->stream_connect);
 		}
 		else
 		{
@@ -313,13 +313,13 @@ static void energy_task_running_state(uint32_t _events)
 	}
 	if(ENERGY_FAST_CONNECTED == (_events & ENERGY_FAST_CONNECTED))
 	{
-		pl_event_set(energy_config->fast_vars_events, energy_config->vars_config);
+		absl_event_set(energy_config->fast_vars_events, energy_config->vars_config);
 	}
 	if(ENERGY_FAST_CONFIGURED == (_events & ENERGY_FAST_CONFIGURED))
 	{
 		energy_enable_data_obtaining_fast();
 		obtain_fast_vars = true;
-		pl_event_set(energy_config->system_events, energy_config->wf_running);
+		absl_event_set(energy_config->system_events, energy_config->wf_running);
 	}
 	if(ENERGY_FAST_NOT_CONNECTED == (_events & ENERGY_FAST_NOT_CONNECTED))
 	{
@@ -330,10 +330,10 @@ static void energy_task_running_state(uint32_t _events)
 		if(true == obtain_fast_vars)
 		{
 			obtain_fast_vars = false;
-			pl_event_set(energy_config->system_events, energy_config->wf_stopped);
+			absl_event_set(energy_config->system_events, energy_config->wf_stopped);
 			energy_clear_waveform();
 
-			pl_event_set(energy_config->fast_vars_stream_events, energy_config->stream_disconnect);
+			absl_event_set(energy_config->fast_vars_stream_events, energy_config->stream_disconnect);
 		}
 		else
 		{
@@ -346,7 +346,7 @@ static void energy_task_running_state(uint32_t _events)
 		{
 			energy_clear_slow_vars();
 
-			pl_event_set(energy_config->slow_vars_stream_events, energy_config->stream_connect);
+			absl_event_set(energy_config->slow_vars_stream_events, energy_config->stream_connect);
 		}
 		else
 		{
@@ -355,13 +355,13 @@ static void energy_task_running_state(uint32_t _events)
 	}
 	if(ENERGY_SLOW_CONNECTED == (_events & ENERGY_SLOW_CONNECTED))
 	{
-		pl_event_set(energy_config->slow_vars_events, energy_config->vars_config);
+		absl_event_set(energy_config->slow_vars_events, energy_config->vars_config);
 	}
 	if(ENERGY_SLOW_CONFIGURED == (_events & ENERGY_SLOW_CONFIGURED))
 	{
 		energy_enable_data_obtaining_slow();
 		obtain_slow_vars = true;
-		pl_event_set(energy_config->system_events, energy_config->reg_running);
+		absl_event_set(energy_config->system_events, energy_config->reg_running);
 	}
 	if(ENERGY_SLOW_NOT_CONNECTED == (_events & ENERGY_SLOW_NOT_CONNECTED))
 	{
@@ -372,10 +372,10 @@ static void energy_task_running_state(uint32_t _events)
 		if(true == obtain_slow_vars)
 		{
 			obtain_slow_vars = false;
-			pl_event_set(energy_config->system_events, energy_config->reg_stopped);
+			absl_event_set(energy_config->system_events, energy_config->reg_stopped);
 			energy_clear_slow_vars();
 
-			pl_event_set(energy_config->slow_vars_stream_events, energy_config->stream_disconnect);
+			absl_event_set(energy_config->slow_vars_stream_events, energy_config->stream_disconnect);
 		}
 		else
 		{
@@ -385,7 +385,7 @@ static void energy_task_running_state(uint32_t _events)
 	if(ENERGY_CONFIG_RESET ==(_events & ENERGY_CONFIG_RESET))
 	{
 		energy_normal_state = ENERGY_TASK_NORMAL_STATE_CONFIGURE;
-		pl_event_set(energy_config->system_events, energy_config->reconfig_event);
+		absl_event_set(energy_config->system_events, energy_config->reconfig_event);
 	}
 	if(ENERGY_CONFIGURATION == (_events & ENERGY_CONFIGURATION))
 	{
@@ -414,7 +414,7 @@ static bool energy_task_startup(void)
 
 	if(!energy_startup())
 	{
-		pl_debug_printf("ERROR! Energy startup process failed.\n");
+		absl_debug_printf("ERROR! Energy startup process failed.\n");
 	}
 	else
 	{

@@ -1,0 +1,5 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/cmd/cmd_task.c:522:13:cmd_task_check_disconnected	32	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/cmd/cmd_task.c:456:13:cmd_task_get_sensor_service_index	40	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/cmd/cmd_task.c:200:13:cmd_task_normal_state	264	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/cmd/cmd_task.c:68:6:cmd_task_initialize	32	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/cmd/cmd_task.c:105:6:cmd_task	48	static

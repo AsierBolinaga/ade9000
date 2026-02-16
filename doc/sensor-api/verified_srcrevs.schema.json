@@ -1,0 +1,36 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "You can use https://json-schema-faker.js.org/ to generate sample json structures. Check option alwaysFakeOptionals. Unckeck option fillProperties",
+    "type": "object",
+    "properties": {
+        "repos":{
+            "type": "array",
+            "description": "List of repos that implement part of de API defined in this repo",
+            "items": {
+                "urls": {
+                    "type": "array",
+                    "description": "List of alternative repo URLs. A repo can be mirrored in multiple sites, or exist only in one remote.",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "paths": {
+                    "type": "array",
+                    "description": "Path list that implement the API described here. It can be files or directories.",
+                    "items": {
+                        "path": {
+                            "type": "string",
+                            "description": "Path of source code implementation of API. Relative paths referenced to parent directory project root."
+                        },
+                        "srcrev": {
+                            "type": "string",
+                            "description": "git commit hash that the source repo must match in order to pass pre-push git hook QC"
+                        }
+                    }
+
+            }
+        }
+    }
+}
+}
+ 

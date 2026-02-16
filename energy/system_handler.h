@@ -90,7 +90,7 @@ energy_hw_config_t system_get_hw_config(void);
 
 sync_type_t system_sync_get_sync_type(void);
 
-pl_time_t system_sync_get_sync_period(void);
+absl_time_t system_sync_get_sync_period(void);
 
 bool system_get_current_a_invert(void);
 

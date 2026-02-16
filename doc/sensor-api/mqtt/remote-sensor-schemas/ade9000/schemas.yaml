@@ -1,0 +1,10 @@
+title: ADE9000
+version: "1.0.0"
+hash: ""
+sensor:
+  $ref: ./sensor.json
+service:
+  title: "ADE9000 services" #otherwise <anonymous-schema-xx>
+  oneOf:
+    - $ref: ./services/raw.json
+    - $ref: ./services/registers.json

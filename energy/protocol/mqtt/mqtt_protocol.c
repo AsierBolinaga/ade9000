@@ -9,14 +9,14 @@
 #include "json.h"
 #include "interfaces.h"
 
-#include "pl_hw_config.h"
-#include "pl_mqtt.h"
-#include "pl_thread.h"
-#include "pl_debug.h"
-#include "pl_macros.h"
-#include "pl_timer.h"
-#include "pl_time.h"
-#include "pl_event.h"
+#include "absl_hw_config.h"
+#include "absl_mqtt.h"
+#include "absl_thread.h"
+#include "absl_debug.h"
+#include "absl_macros.h"
+#include "absl_timer.h"
+#include "absl_time.h"
+#include "absl_event.h"
 
 #define MAX_SENSOR_AMOUNT 		2
 #define MAX_SERVICE_AMOUNT 		MAX_SENSOR_AMOUNT * 2
@@ -149,12 +149,12 @@ static mqtt_topics_info_t mqtt_publish_topics_info[MQTT_PUB_TOPICS_MAXVALUE] =
 #endif
 };
 
-static pl_mqtt_topics_t last_will;
+static absl_mqtt_topics_t last_will;
 static char* json_last_will_buff = NULL;
-static pl_mqtt_topics_t topics_to_subscribe[MQTT_SUB_TOPICS_MAXVALUE];
+static absl_mqtt_topics_t topics_to_subscribe[MQTT_SUB_TOPICS_MAXVALUE];
 
-static pl_mqtt_t			cmd_mqtt;
-static pl_mqtt_config_t* 	cmd_mqtt_config;
+static absl_mqtt_t			cmd_mqtt;
+static absl_mqtt_config_t* 	cmd_mqtt_config;
 
 static sensor_config_t* 	sensors_config;
 static uint8_t		 		sensor_amount;
@@ -163,17 +163,17 @@ static char*				model;
 static char*				fw_version;
 static void* 				events_array;
 
-bool mqtt_protocol_init(protocol_config_t* _protocol_config, pl_event_t* _event_group,
+bool mqtt_protocol_init(protocol_config_t* _protocol_config, absl_event_t* _event_group,
 						uint32_t _rx_event, uint32_t _frame_rx_event, uint32_t _server_timeout_event, 
 						uint32_t _server_disconnected_event, uint32_t _full_buff_event)
 {
 	bool return_value = false;
 
-	cmd_mqtt_config = pl_config_get_mqtt_conf(_protocol_config->mqtt_conf_index);
-	if(PL_MQTT_RV_OK == pl_mqtt_init(&cmd_mqtt, cmd_mqtt_config))
+	cmd_mqtt_config = absl_config_get_mqtt_conf(_protocol_config->mqtt_conf_index);
+	if(ABSL_MQTT_RV_OK == absl_mqtt_init(&cmd_mqtt, cmd_mqtt_config))
 	{
-		pl_mqtt_config_rx_event(&cmd_mqtt, _event_group, _rx_event, _frame_rx_event, _server_disconnected_event, _server_timeout_event, _full_buff_event);
-		if(PL_MQTT_RV_OK == pl_mqtt_create(&cmd_mqtt))
+		absl_mqtt_config_rx_event(&cmd_mqtt, _event_group, _rx_event, _frame_rx_event, _server_disconnected_event, _server_timeout_event, _full_buff_event);
+		if(ABSL_MQTT_RV_OK == absl_mqtt_create(&cmd_mqtt))
 		{
 			sensors_config = _protocol_config->sensors_config;
 			sensor_amount = _protocol_config->sensor_amount;
@@ -206,7 +206,7 @@ bool mqtt_protocol_connect(void)
 	last_will.qos = mqtt_publish_topics_info[MQTT_STATE_TOPIC].QoS;
 	json_last_will_buff = json_get_status_data("offline", NULL, 0);
 
-	if(PL_MQTT_RV_OK == pl_mqtt_connect(&cmd_mqtt, deviceID, last_will, json_last_will_buff))
+	if(ABSL_MQTT_RV_OK == absl_mqtt_connect(&cmd_mqtt, deviceID, last_will, json_last_will_buff))
 	{
 		for(topic_index = 0; topic_index < MQTT_SUB_TOPICS_MAXVALUE; topic_index++)
 		{
@@ -221,7 +221,7 @@ bool mqtt_protocol_connect(void)
 			topics_to_subscribe[topic_index].qos = mqtt_subscribe_topics_info[topic_index].QoS;
 		}
 
-		if(PL_MQTT_RV_OK == pl_mqtt_subscribe_topics(&cmd_mqtt, topics_to_subscribe,  MQTT_SUB_TOPICS_MAXVALUE))
+		if(ABSL_MQTT_RV_OK == absl_mqtt_subscribe_topics(&cmd_mqtt, topics_to_subscribe,  MQTT_SUB_TOPICS_MAXVALUE))
 		{
 			return_value = true;
 		}
@@ -237,9 +237,9 @@ bool mqtt_protocol_reconnect(void)
 
 	json_last_will_buff = json_get_status_data("offline", NULL, 0);
 
-	if(PL_MQTT_RV_OK == pl_mqtt_reconnect(&cmd_mqtt, json_last_will_buff))
+	if(ABSL_MQTT_RV_OK == absl_mqtt_reconnect(&cmd_mqtt, json_last_will_buff))
 	{
-		if(PL_MQTT_RV_OK == pl_mqtt_subscribe_topics(&cmd_mqtt, topics_to_subscribe, MQTT_SUB_TOPICS_MAXVALUE))
+		if(ABSL_MQTT_RV_OK == absl_mqtt_subscribe_topics(&cmd_mqtt, topics_to_subscribe, MQTT_SUB_TOPICS_MAXVALUE))
 		{
 			return_value = true;
 		}
@@ -255,7 +255,7 @@ bool mqtt_protocol_send_discovery(void)
 	bool return_value = false;
 
 	char* json_discovery_data_buff;
-	pl_mqtt_topics_t discovery_topic;
+	absl_mqtt_topics_t discovery_topic;
 
 	strcpy(discovery_topic.topics, mqtt_publish_topics_info[MQTT_DISCOVERY_TOPIC].preID_topic);
 	if(mqtt_publish_topics_info[MQTT_STATE_TOPIC].has_id)
@@ -267,7 +267,7 @@ bool mqtt_protocol_send_discovery(void)
 
 	json_discovery_data_buff = json_get_discovery_data(sensor_amount, sensors_config, model, fw_version);
 
-	if(PL_MQTT_RV_OK == pl_mqtt_publish(&cmd_mqtt,
+	if(ABSL_MQTT_RV_OK == absl_mqtt_publish(&cmd_mqtt,
 										discovery_topic.topics,
 										json_discovery_data_buff,
 										strlen(json_discovery_data_buff),
@@ -310,8 +310,8 @@ bool mqtt_protocol_device_status_changed(state_change_data_t* _state_change_data
 
 	char* json_status_data_buff = NULL;
 
-	pl_mqtt_rv_t     mqtt_rv;
-	pl_mqtt_topics_t status_topic;
+	absl_mqtt_rv_t     mqtt_rv;
+	absl_mqtt_topics_t status_topic;
 
 	strcpy(status_topic.topics, mqtt_publish_topics_info[MQTT_STATE_TOPIC].preID_topic);
 	if(mqtt_publish_topics_info[MQTT_STATE_TOPIC].has_id)
@@ -339,20 +339,20 @@ bool mqtt_protocol_device_status_changed(state_change_data_t* _state_change_data
 
 	if(NULL != json_status_data_buff)
 	{
-		mqtt_rv = pl_mqtt_publish(&cmd_mqtt,
+		mqtt_rv = absl_mqtt_publish(&cmd_mqtt,
 								status_topic.topics,
 								json_status_data_buff,
 								strlen(json_status_data_buff),
 								status_topic.qos,
 								true);
 
-		if((PL_MQTT_RV_OK == mqtt_rv) || (PL_MQTT_RV_DISCONNETED == mqtt_rv))
+		if((ABSL_MQTT_RV_OK == mqtt_rv) || (ABSL_MQTT_RV_DISCONNETED == mqtt_rv))
 		{
 			return_value = true;
 		}
-		else if(PL_MQTT_RV_DISCONNETED == mqtt_rv)
+		else if(ABSL_MQTT_RV_DISCONNETED == mqtt_rv)
 		{
-			pl_debug_printf("MQTT disconnected from broker! Device status not send\n");
+			absl_debug_printf("MQTT disconnected from broker! Device status not send\n");
 			return_value = true;
 		}
 
@@ -367,8 +367,8 @@ bool mqtt_protocol_signalize_event(alert_data_t* _alert_data)
 	bool return_value = false;
 	char* json_status_data_buff;
 
-	pl_mqtt_rv_t     mqtt_rv;
-	pl_mqtt_topics_t status_topic;
+	absl_mqtt_rv_t     mqtt_rv;
+	absl_mqtt_topics_t status_topic;
 
 	status_topic.qos = mqtt_publish_topics_info[MQTT_ALERT_TOPIC].QoS;
 
@@ -394,20 +394,20 @@ bool mqtt_protocol_signalize_event(alert_data_t* _alert_data)
 
 	if(NULL != json_status_data_buff)
 	{
-		mqtt_rv = pl_mqtt_publish(&cmd_mqtt,
+		mqtt_rv = absl_mqtt_publish(&cmd_mqtt,
 								status_topic.topics,
 								json_status_data_buff,
 								strlen(json_status_data_buff),
 								status_topic.qos,
 								false);
 
-		if(PL_MQTT_RV_OK == mqtt_rv)
+		if(ABSL_MQTT_RV_OK == mqtt_rv)
 		{
 			return_value = true;
 		}
-		else if(PL_MQTT_RV_DISCONNETED == mqtt_rv)
+		else if(ABSL_MQTT_RV_DISCONNETED == mqtt_rv)
 		{
-			pl_debug_printf("MQTT disconnected from broker! Event not send\n");
+			absl_debug_printf("MQTT disconnected from broker! Event not send\n");
 			return_value = true; 
 		}
 	}
@@ -426,8 +426,8 @@ bool mqtt_protocol_send_timestamp(uint64_t _time)
 	bool return_value = false;
 	char* json_time_data_buff;
 
-	pl_mqtt_rv_t     mqtt_rv;
-	pl_mqtt_topics_t time_topic;
+	absl_mqtt_rv_t     mqtt_rv;
+	absl_mqtt_topics_t time_topic;
 
 	time_topic.qos = mqtt_publish_topics_info[MQTT_TIME_TOPIC].QoS;
 
@@ -442,20 +442,20 @@ bool mqtt_protocol_send_timestamp(uint64_t _time)
 
 	if(NULL != json_time_data_buff)
 	{
-		mqtt_rv = pl_mqtt_publish(&cmd_mqtt,
+		mqtt_rv = absl_mqtt_publish(&cmd_mqtt,
 								time_topic.topics,
 								json_time_data_buff,
 								strlen(json_time_data_buff),
 								time_topic.qos,
 								false);
 
-		if(PL_MQTT_RV_OK == mqtt_rv)
+		if(ABSL_MQTT_RV_OK == mqtt_rv)
 		{
 			return_value = true;
 		}
-		else if(PL_MQTT_RV_DISCONNETED == mqtt_rv)
+		else if(ABSL_MQTT_RV_DISCONNETED == mqtt_rv)
 		{
-			pl_debug_printf("MQTT disconnected from broker! Event not send\n");
+			absl_debug_printf("MQTT disconnected from broker! Event not send\n");
 			return_value = true; 
 		}
 	}
@@ -474,8 +474,8 @@ bool mqtt_protocol_send_info(device_status_information_t* _device_status_info)
 	bool return_value = false;
 	char* json_info_data_buff;
 
-	pl_mqtt_rv_t     mqtt_rv;
-	pl_mqtt_topics_t info_topic;
+	absl_mqtt_rv_t     mqtt_rv;
+	absl_mqtt_topics_t info_topic;
 
 	info_topic.qos = mqtt_publish_topics_info[MQTT_INFO_TOPIC].QoS;
 
@@ -490,20 +490,20 @@ bool mqtt_protocol_send_info(device_status_information_t* _device_status_info)
 
 	if(NULL != json_info_data_buff)
 	{
-		mqtt_rv = pl_mqtt_publish(&cmd_mqtt,
+		mqtt_rv = absl_mqtt_publish(&cmd_mqtt,
 								info_topic.topics,
 								json_info_data_buff,
 								strlen(json_info_data_buff),
 								info_topic.qos,
 								false);
 
-		if(PL_MQTT_RV_OK == mqtt_rv)
+		if(ABSL_MQTT_RV_OK == mqtt_rv)
 		{
 			return_value = true;
 		}
-		else if(PL_MQTT_RV_DISCONNETED == mqtt_rv)
+		else if(ABSL_MQTT_RV_DISCONNETED == mqtt_rv)
 		{
-			pl_debug_printf("MQTT disconnected from broker! Event not send\n");
+			absl_debug_printf("MQTT disconnected from broker! Event not send\n");
 			return_value = true;
 		}
 	}
@@ -519,8 +519,8 @@ bool mqtt_protocol_send_info(device_status_information_t* _device_status_info)
 
 bool mqtt_protocol_disconnect(void)
 {
-	pl_mqtt_disconnect(&cmd_mqtt);
-	pl_mqtt_reset(&cmd_mqtt);
+	absl_mqtt_disconnect(&cmd_mqtt);
+	absl_mqtt_reset(&cmd_mqtt);
 	return true;
 }
 
@@ -531,7 +531,7 @@ manufacturing_t	mqtt_protocol_get_manufactur(void)
 
 char* mqtt_protocol_get_ip(void)
 {
-	return pl_mqtt_get_ip(&cmd_mqtt);
+	return absl_mqtt_get_ip(&cmd_mqtt);
 }
 
 
@@ -548,19 +548,19 @@ char* mqtt_protocol_get_sync_interval(void)
 protocol_rv_t mqtt_protocol_listen(char* _sensor, char* _service, uint32_t _msg_get_timeout_seg, uint32_t *_messages_left)
 {
 	protocol_rv_t return_received_msg_type = PROTOCOL_INVALID_MESSAGE;
-	pl_mqtt_rv_t message_get_rv;
+	absl_mqtt_rv_t message_get_rv;
 
-	message_get_rv = pl_mqtt_wait_messages(&cmd_mqtt, _messages_left, _msg_get_timeout_seg);
+	message_get_rv = absl_mqtt_wait_messages(&cmd_mqtt, _messages_left, _msg_get_timeout_seg);
 
-	if(PL_MQTT_RV_OK == message_get_rv)
+	if(ABSL_MQTT_RV_OK == message_get_rv)
 	{
 		return_received_msg_type =  mqtt_protocol_messages_to_get(_sensor, _service, _messages_left);
 	}
-	else if(PL_MQTT_RV_DISCONNETED == message_get_rv)
+	else if(ABSL_MQTT_RV_DISCONNETED == message_get_rv)
 	{
 		return_received_msg_type = PROTOCOL_DISCONNECTED;
 	}
-	else if(PL_MQTT_RV_TIMEOUT== message_get_rv)
+	else if(ABSL_MQTT_RV_TIMEOUT== message_get_rv)
 	{
 		return_received_msg_type = PROTOCOL_TIMEOUT;
 	}
@@ -584,7 +584,7 @@ protocol_rv_t mqtt_protocol_messages_to_get(char* _sensor, char* _service, uint3
 	memset(topic, 0, 100);
 	memset(mqtt_payload, 0, 1000);
 
-	*_messages_left = pl_mqtt_get_message(&cmd_mqtt, &topic_length, topic, &length, mqtt_payload);
+	*_messages_left = absl_mqtt_get_message(&cmd_mqtt, &topic_length, topic, &length, mqtt_payload);
 
 	for(topic_index = 0; topic_index < MQTT_SUB_TOPICS_MAXVALUE; topic_index++)
 	{
@@ -612,7 +612,7 @@ protocol_rv_t mqtt_protocol_messages_to_get(char* _sensor, char* _service, uint3
 
 uint32_t mqtt_protocol_get_frame(uint8_t* _frame)
 {
-	return pl_mqtt_get_frame(&cmd_mqtt, (char*)_frame);
+	return absl_mqtt_get_frame(&cmd_mqtt, (char*)_frame);
 }
 
 protocol_rv_t mqtt_protocol_frame_type(char* _sensor, char* _service)
@@ -623,7 +623,7 @@ protocol_rv_t mqtt_protocol_frame_type(char* _sensor, char* _service)
 	uint32_t length_to_compare;
 
 	memset(topic, 0, 100);
-	memcpy(topic,  pl_mqtt_get_last_topic(&cmd_mqtt), pl_mqtt_get_last_topic_length(&cmd_mqtt));
+	memcpy(topic,  absl_mqtt_get_last_topic(&cmd_mqtt), absl_mqtt_get_last_topic_length(&cmd_mqtt));
 
 	for(topic_index = 0; topic_index < MQTT_SUB_TOPICS_MAXVALUE; topic_index++)
 	{
@@ -652,7 +652,7 @@ protocol_rv_t mqtt_protocol_frame_type(char* _sensor, char* _service)
 #ifdef FABRICATION_TEST
 void mqtt_protocol_send_id(uint32_t _id)
 {
-	pl_mqtt_topics_t id_topic;
+	absl_mqtt_topics_t id_topic;
 	char*	json_id_data_buff;
 
 	id_topic.qos = mqtt_publish_topics_info[MQTT_ID].QoS;
@@ -666,7 +666,7 @@ void mqtt_protocol_send_id(uint32_t _id)
 		strcat(id_topic.topics, mqtt_publish_topics_info[MQTT_ID].postID_topic);
 	}
 
-	 pl_mqtt_publish(&cmd_mqtt,
+	 absl_mqtt_publish(&cmd_mqtt,
 					 id_topic.topics,
 					 json_id_data_buff,
 					 strlen(json_id_data_buff),
@@ -678,7 +678,7 @@ void mqtt_protocol_send_id(uint32_t _id)
 
 void mqtt_protocol_irq0_detected(bool _irq0_detected)
 {
-	pl_mqtt_topics_t irq0_topic;
+	absl_mqtt_topics_t irq0_topic;
 	char*	json_iq0_data_buff;
 
 	json_iq0_data_buff = json_get_irq0_data(_irq0_detected);
@@ -690,7 +690,7 @@ void mqtt_protocol_irq0_detected(bool _irq0_detected)
 		strcat(irq0_topic.topics, mqtt_publish_topics_info[MQTT_IRQ0].postID_topic);
 	}
 
-	 pl_mqtt_publish(&cmd_mqtt,
+	 absl_mqtt_publish(&cmd_mqtt,
 			 	 	 irq0_topic.topics,
 					 json_iq0_data_buff,
 					 strlen(json_iq0_data_buff),
@@ -702,7 +702,7 @@ void mqtt_protocol_irq0_detected(bool _irq0_detected)
 
 void mqtt_protocol_reset_done(bool _reset_done)
 {
-	pl_mqtt_topics_t reset_topic;
+	absl_mqtt_topics_t reset_topic;
 	char*	json_reset_data_buff;
 
 	json_reset_data_buff = json_get_reset_data(_reset_done);
@@ -714,7 +714,7 @@ void mqtt_protocol_reset_done(bool _reset_done)
 		strcat(reset_topic.topics, mqtt_publish_topics_info[MQTT_RST].postID_topic);
 	}
 
-	 pl_mqtt_publish(&cmd_mqtt,
+	 absl_mqtt_publish(&cmd_mqtt,
 			 	 	 reset_topic.topics,
 			 	 	 json_reset_data_buff,
 					 strlen(json_reset_data_buff),
@@ -726,7 +726,7 @@ void mqtt_protocol_reset_done(bool _reset_done)
 
 void mqtt_protocol_send_written_manufacturing(bool _written)
 {
-	pl_mqtt_topics_t manu_topic;
+	absl_mqtt_topics_t manu_topic;
 	char*	json_manu_data_buff;
 
 	json_manu_data_buff = json_get_manufactur_written_data(_written);
@@ -738,7 +738,7 @@ void mqtt_protocol_send_written_manufacturing(bool _written)
 		strcat(manu_topic.topics, mqtt_publish_topics_info[MQTT_MANU_WRITTEN].postID_topic);
 	}
 
-	 pl_mqtt_publish(&cmd_mqtt,
+	 absl_mqtt_publish(&cmd_mqtt,
 					 manu_topic.topics,
 					 json_manu_data_buff,
 					 strlen(json_manu_data_buff),
@@ -755,8 +755,8 @@ static bool mqtt_protocol_sensor_status_changed(state_change_data_t* _state_chan
 
 	char* json_status_data_buff = NULL;
 
-	pl_mqtt_rv_t     mqtt_rv;
-	pl_mqtt_topics_t status_topic;
+	absl_mqtt_rv_t     mqtt_rv;
+	absl_mqtt_topics_t status_topic;
 
 	strcpy(status_topic.topics, mqtt_publish_topics_info[MQTT_STATE_TOPIC].preID_topic);
 	if(mqtt_publish_topics_info[MQTT_STATE_TOPIC].has_id)
@@ -788,20 +788,20 @@ static bool mqtt_protocol_sensor_status_changed(state_change_data_t* _state_chan
 
 	if(NULL != json_status_data_buff)
 	{
-		mqtt_rv = pl_mqtt_publish(&cmd_mqtt,
+		mqtt_rv = absl_mqtt_publish(&cmd_mqtt,
 								status_topic.topics,
 								json_status_data_buff,
 								strlen(json_status_data_buff),
 								status_topic.qos,
 								true);
 
-		if(PL_MQTT_RV_OK == mqtt_rv)
+		if(ABSL_MQTT_RV_OK == mqtt_rv)
 		{
 			return_value = true;
 		}
-		else if(PL_MQTT_RV_DISCONNETED == mqtt_rv)
+		else if(ABSL_MQTT_RV_DISCONNETED == mqtt_rv)
 		{
-			pl_debug_printf("MQTT disconnected from bkroker! Device status not send\n");
+			absl_debug_printf("MQTT disconnected from bkroker! Device status not send\n");
 			return_value = true;
 		}
 
@@ -820,8 +820,8 @@ static bool mqtt_protocol_service_status_changed(state_change_data_t* _state_cha
 	bool return_value = false;
 	char* json_status_data_buff = NULL;
 
-	pl_mqtt_rv_t     mqtt_rv;
-	pl_mqtt_topics_t status_topic;
+	absl_mqtt_rv_t     mqtt_rv;
+	absl_mqtt_topics_t status_topic;
 
 	strcpy(status_topic.topics, mqtt_publish_topics_info[MQTT_STATE_TOPIC].preID_topic);
 	if(mqtt_publish_topics_info[MQTT_STATE_TOPIC].has_id)
@@ -855,20 +855,20 @@ static bool mqtt_protocol_service_status_changed(state_change_data_t* _state_cha
 
 	if(NULL != json_status_data_buff)
 	{
-		mqtt_rv = pl_mqtt_publish(&cmd_mqtt,
+		mqtt_rv = absl_mqtt_publish(&cmd_mqtt,
 								status_topic.topics,
 								json_status_data_buff,
 								strlen(json_status_data_buff),
 								status_topic.qos,
 								true);
 
-		if(PL_MQTT_RV_OK == mqtt_rv)
+		if(ABSL_MQTT_RV_OK == mqtt_rv)
 		{
 			return_value = true;
 		}
-		else if(PL_MQTT_RV_DISCONNETED == mqtt_rv)
+		else if(ABSL_MQTT_RV_DISCONNETED == mqtt_rv)
 		{
-			pl_debug_printf("MQTT disconnected from broker! Service status not send\n");
+			absl_debug_printf("MQTT disconnected from broker! Service status not send\n");
 			return_value = true;
 		}
 
@@ -886,7 +886,7 @@ static protocol_rv_t mqtt_protocol_config_message_received(char* _sensor, char* 
 {
 	protocol_rv_t 	return_received_msg = PROTOCOL_INVALID_CONFIG_MESSAGE;
 
-	PL_UNUSED_ARG(_service);
+	ABSL_UNUSED_ARG(_service);
 
 	for(uint32_t sensor_index = 0; sensor_index < sensor_amount; sensor_index++)
 	{
@@ -954,45 +954,45 @@ static protocol_rv_t mqtt_protocol_start_message_received(char* _sensor, char* _
 
 protocol_rv_t mqtt_protocol_stop_messager_received(char* _sensor, char* _service, char* _rx_buffer)
 {
-	PL_UNUSED_ARG(_sensor);
-	PL_UNUSED_ARG(_service);
-	PL_UNUSED_ARG(_rx_buffer);
+	ABSL_UNUSED_ARG(_sensor);
+	ABSL_UNUSED_ARG(_service);
+	ABSL_UNUSED_ARG(_rx_buffer);
 
 	return PROTOCOL_STOP_CMD_RECIEVED;
 }
 
 static protocol_rv_t mqtt_protocol_reset_message_received(char* _sensor, char* _service, char* _rx_buffer)
 {
-	PL_UNUSED_ARG(_sensor);
-	PL_UNUSED_ARG(_service);
-	PL_UNUSED_ARG(_rx_buffer);
+	ABSL_UNUSED_ARG(_sensor);
+	ABSL_UNUSED_ARG(_service);
+	ABSL_UNUSED_ARG(_rx_buffer);
 
 	return PROTOCOL_RESET_MSG_RECIEVED;
 }
 
 static protocol_rv_t mqtt_protocol_reset_sensor_message_received(char* _sensor, char* _service, char* _rx_buffer)
 {
-	PL_UNUSED_ARG(_sensor);
-	PL_UNUSED_ARG(_service);
-	PL_UNUSED_ARG(_rx_buffer);
+	ABSL_UNUSED_ARG(_sensor);
+	ABSL_UNUSED_ARG(_service);
+	ABSL_UNUSED_ARG(_rx_buffer);
 
 	return PROTOCOL_SENSOR_RESET_MSG_RECIEVED;
 }
 
 static protocol_rv_t mqtt_protocol_reboot_message_received(char* _sensor, char* _service, char* _rx_buffer)
 {
-	PL_UNUSED_ARG(_sensor);
-	PL_UNUSED_ARG(_service);
-	PL_UNUSED_ARG(_rx_buffer);
+	ABSL_UNUSED_ARG(_sensor);
+	ABSL_UNUSED_ARG(_service);
+	ABSL_UNUSED_ARG(_rx_buffer);
 
 	return PROTOCOL_REBOOT_MSG_RECIEVED;
 }
 
 static protocol_rv_t mqtt_protocol_update_message_received(char* _sensor, char* _service, char* _rx_buffer)
 {
-	PL_UNUSED_ARG(_sensor);
-	PL_UNUSED_ARG(_service);
-	PL_UNUSED_ARG(_rx_buffer);
+	ABSL_UNUSED_ARG(_sensor);
+	ABSL_UNUSED_ARG(_service);
+	ABSL_UNUSED_ARG(_rx_buffer);
 
 	return PROTOCOL_UPDATE_MSG_RECIEVED;
 }
@@ -1001,8 +1001,8 @@ static protocol_rv_t mqtt_protocol_sync_time_message_received(char* _sensor, cha
 {
 	protocol_rv_t return_received_msg = PROTOCOL_INVALID_SYNC_MESSAGE;
 
-	PL_UNUSED_ARG(_sensor);
-	PL_UNUSED_ARG(_service);
+	ABSL_UNUSED_ARG(_sensor);
+	ABSL_UNUSED_ARG(_service);
 
 	if(true == json_get_time_sync_config(&last_sync_config, _rx_buffer))
 	{
@@ -1014,9 +1014,9 @@ static protocol_rv_t mqtt_protocol_sync_time_message_received(char* _sensor, cha
 
 static protocol_rv_t mqtt_protocol_get_timestamp_message_received(char* _sensor, char* _service, char* _rx_buffer)
 {
-	PL_UNUSED_ARG(_sensor);
-	PL_UNUSED_ARG(_service);
-	PL_UNUSED_ARG(_rx_buffer);
+	ABSL_UNUSED_ARG(_sensor);
+	ABSL_UNUSED_ARG(_service);
+	ABSL_UNUSED_ARG(_rx_buffer);
 
 	return PROTOCOL_GET_TIMESTAMP_MSG_RECIEVED;
 }
@@ -1024,9 +1024,9 @@ static protocol_rv_t mqtt_protocol_get_timestamp_message_received(char* _sensor,
 static protocol_rv_t mqtt_protocol_get_info_message_received(char* _sensor, char* _service, char* _rx_buffer)
 {
 
-	PL_UNUSED_ARG(_sensor);
-	PL_UNUSED_ARG(_service);
-	PL_UNUSED_ARG(_rx_buffer);
+	ABSL_UNUSED_ARG(_sensor);
+	ABSL_UNUSED_ARG(_service);
+	ABSL_UNUSED_ARG(_rx_buffer);
 
 	return PROTOCOL_GET_INFO_MSG_RECIEVED;
 }
@@ -1035,8 +1035,8 @@ static protocol_rv_t mqtt_protocol_manufactur_message_received(char* _sensor, ch
 {
 	protocol_rv_t return_received_msg = PROTOCOL_INVALID_MANUFACTUR_MESSAGE;
 
-	PL_UNUSED_ARG(_sensor);
-	PL_UNUSED_ARG(_service);
+	ABSL_UNUSED_ARG(_sensor);
+	ABSL_UNUSED_ARG(_service);
 
 	if(true == json_get_sensor_manufactur(_rx_buffer, &last_manufacturing))
 	{
@@ -1049,72 +1049,72 @@ static protocol_rv_t mqtt_protocol_manufactur_message_received(char* _sensor, ch
 #ifdef FABRICATION_TEST
 static protocol_rv_t mqtt_protocol_request_id_message_received(char* _sensor, char* _service, char* _rx_buffer)
 {
-	PL_UNUSED_ARG(_sensor);
-	PL_UNUSED_ARG(_service);
-	PL_UNUSED_ARG(_rx_buffer);
+	ABSL_UNUSED_ARG(_sensor);
+	ABSL_UNUSED_ARG(_service);
+	ABSL_UNUSED_ARG(_rx_buffer);
 
 	return PROTOCOL_ID_MSG_RECIEVED;
 }
 
 static protocol_rv_t mqtt_protocol_request_irq0_message_received(char* _sensor, char* _service, char* _rx_buffer)
 {
-	PL_UNUSED_ARG(_sensor);
-	PL_UNUSED_ARG(_service);
-	PL_UNUSED_ARG(_rx_buffer);
+	ABSL_UNUSED_ARG(_sensor);
+	ABSL_UNUSED_ARG(_service);
+	ABSL_UNUSED_ARG(_rx_buffer);
 
 	return PROTOCOL_IRQ0_MSG_RECIEVED;
 }
 
 static protocol_rv_t mqtt_protocol_request_irq1_message_received(char* _sensor, char* _service, char* _rx_buffer)
 {
-	PL_UNUSED_ARG(_sensor);
-	PL_UNUSED_ARG(_service);
-	PL_UNUSED_ARG(_rx_buffer);
+	ABSL_UNUSED_ARG(_sensor);
+	ABSL_UNUSED_ARG(_service);
+	ABSL_UNUSED_ARG(_rx_buffer);
 
 	return PROTOCOL_IRQ1_MSG_RECIEVED;
 }
 
 static protocol_rv_t mqtt_protocol_request_reset_message_received(char* _sensor, char* _service, char* _rx_buffer)
 {
-	PL_UNUSED_ARG(_sensor);
-	PL_UNUSED_ARG(_service);
-	PL_UNUSED_ARG(_rx_buffer);
+	ABSL_UNUSED_ARG(_sensor);
+	ABSL_UNUSED_ARG(_service);
+	ABSL_UNUSED_ARG(_rx_buffer);
 
 	return PROTOCOL_RST_MSG_RECIEVED;
 }
 
 static protocol_rv_t mqtt_protocol_udp_test_start_message_received(char* _sensor, char* _service, char* _rx_buffer)
 {
-	PL_UNUSED_ARG(_sensor);
-	PL_UNUSED_ARG(_service);
-	PL_UNUSED_ARG(_rx_buffer);
+	ABSL_UNUSED_ARG(_sensor);
+	ABSL_UNUSED_ARG(_service);
+	ABSL_UNUSED_ARG(_rx_buffer);
 
 	return PROTOCOL_UDP_START_MSG_RECIEVED;
 }
 
 static protocol_rv_t mqtt_protocol_udp_test_stop_message_received(char* _sensor, char* _service, char* _rx_buffer)
 {
-	PL_UNUSED_ARG(_sensor);
-	PL_UNUSED_ARG(_service);
-	PL_UNUSED_ARG(_rx_buffer);
+	ABSL_UNUSED_ARG(_sensor);
+	ABSL_UNUSED_ARG(_service);
+	ABSL_UNUSED_ARG(_rx_buffer);
 
 	return PROTOCOL_UDP_STOP_MSG_RECIEVED;
 }
 
 static protocol_rv_t mqtt_protocol_tcp_test_start_message_received(char* _sensor, char* _service, char* _rx_buffer)
 {
-	PL_UNUSED_ARG(_sensor);
-	PL_UNUSED_ARG(_service);
-	PL_UNUSED_ARG(_rx_buffer);
+	ABSL_UNUSED_ARG(_sensor);
+	ABSL_UNUSED_ARG(_service);
+	ABSL_UNUSED_ARG(_rx_buffer);
 
 	return PROTOCOL_TCP_START_MSG_RECIEVED;
 }
 
 static protocol_rv_t mqtt_protocol_tcp_test_stop_message_received(char* _sensor, char* _service, char* _rx_buffer)
 {
-	PL_UNUSED_ARG(_sensor);
-	PL_UNUSED_ARG(_service);
-	PL_UNUSED_ARG(_rx_buffer);
+	ABSL_UNUSED_ARG(_sensor);
+	ABSL_UNUSED_ARG(_service);
+	ABSL_UNUSED_ARG(_rx_buffer);
 
 	return PROTOCOL_TCP_STOP_MSG_RECIEVED;
 }
@@ -1148,5 +1148,5 @@ static void mqtt_protocol_get_sensor_and_service_from_topic(uint8_t _topic_index
 
 void mqtt_protocol_reset(void)
 {
-	pl_mqtt_reset(&cmd_mqtt);
+	absl_mqtt_reset(&cmd_mqtt);
 }

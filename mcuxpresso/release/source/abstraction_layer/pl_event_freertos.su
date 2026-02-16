@@ -1,0 +1,7 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_event_freertos.c:12:15:absl_event_create_freertos	8	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_event_freertos.c:31:6:absl_event_set_freertos	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_event_freertos.c:36:15:absl_event_set_fromISR_freertos	16	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_event_freertos.c:61:15:absl_event_wait_freertos	24	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_event_freertos.c:81:15:absl_event_timed_wait_freertos	24	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_event_freertos.c:115:6:absl_event_clear_events_freertos	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_event_freertos.c:121:6:absl_event_clear_all_freertos	0	static

@@ -10,7 +10,7 @@
 
 #include "protocol_types.h"
 
-#include "pl_event.h"
+#include "absl_event.h"
 
 typedef enum mqtt_protocol_events
 {
@@ -26,7 +26,7 @@ typedef enum mqtt_protocol_events
 	MP_EVENTS_MAXVALUE
 }mqtt_protocol_events_t;
 
-bool mqtt_protocol_init(protocol_config_t* _protocol_config, pl_event_t* _event_group,
+bool mqtt_protocol_init(protocol_config_t* _protocol_config, absl_event_t* _event_group,
 						uint32_t _rx_event, uint32_t _frame_rx_event, uint32_t _server_timeout_event, 
 						uint32_t _server_disconnected_event, uint32_t _full_buff_event);
 bool mqtt_protocol_connect(void);

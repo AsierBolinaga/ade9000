@@ -1,0 +1,5 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_watchdog_imxrt10xx.c:27:6:WDOG1_IRQHandler	8	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_watchdog_imxrt10xx.c:33:6:WDOG2_IRQHandler	8	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_watchdog_imxrt10xx.c:39:18:absl_watchdog_init_imxrt10xx	16	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_watchdog_imxrt10xx.c:73:6:absl_watchdog_run_imxrt10xx	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_watchdog_imxrt10xx.c:79:6:absl_watchdog_sw_reset_imxrt10xx	0	static

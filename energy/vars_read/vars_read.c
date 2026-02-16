@@ -9,9 +9,9 @@
 
 #include "interfaces.h"
 
-#include "pl_debug.h"
-#include "pl_time.h"
-#include "pl_system.h"
+#include "absl_debug.h"
+#include "absl_time.h"
+#include "absl_system.h"
 
 /*******************************************************************************
  * type definitions
@@ -34,7 +34,7 @@ bool vars_read_task_initialize(vars_read_thread_config_t* _vars_read_task_config
 
 	if(NULL != _vars_read_task_config)
 	{
-		if(PL_EVENT_RV_OK == pl_event_create(_vars_read_task_config->vars_events))
+		if(ABSL_EVENT_RV_OK == absl_event_create(_vars_read_task_config->vars_events))
 		{
 			_vars_read_task_config->vars_read_initialized = true;
 			return_value = true;
@@ -60,19 +60,19 @@ void vars_read_task(void* arg)
 
 	if(!vars_read_thread_config->vars_read_initialized)
 	{
-		pl_debug_printf("Slow variables task was not initialized!\n");
-		pl_hardfault_handler(THREAD_NOT_INIT_ERROR);
+		absl_debug_printf("Slow variables task was not initialized!\n");
+		absl_hardfault_handler(THREAD_NOT_INIT_ERROR);
 	}
 
 	while(1)
 	{
-		if(PL_EVENT_RV_OK == pl_event_wait(vars_read_thread_config->vars_events, VARS_READ_EVENTS, &event_flags))
+		if(ABSL_EVENT_RV_OK == absl_event_wait(vars_read_thread_config->vars_events, VARS_READ_EVENTS, &event_flags))
 		{
 			if(VARS_CONFIG == (event_flags & VARS_CONFIG))
 			{
 				if(true == vars_read_thread_config->vars_config_cb())
 				{
-					pl_event_set(vars_read_thread_config->energy_event, vars_read_thread_config->vars_configured_flag);
+					absl_event_set(vars_read_thread_config->energy_event, vars_read_thread_config->vars_configured_flag);
 				}
 				else
 				{
@@ -83,8 +83,8 @@ void vars_read_task(void* arg)
 			{
 				if(true == data_to_queue)
 				{
-					if(PL_QUEUE_RV_FULL == pl_queue_send(vars_read_thread_config->read_data_send_queue, vars_read_thread_config->read_vars,
-											PL_QUEUE_NO_DELAY))
+					if(ABSL_QUEUE_RV_FULL == absl_queue_send(vars_read_thread_config->read_data_send_queue, vars_read_thread_config->read_vars,
+											ABSL_QUEUE_NO_DELAY))
 					{
 						vars_read_notify_system_event(vars_read_thread_config->event_info_array, VR_QUEUE_FULL);
 					}
@@ -93,11 +93,11 @@ void vars_read_task(void* arg)
 
 				if(vars_read_thread_config->vars_read_cb(vars_read_thread_config->vars_config, vars_read_thread_config->read_vars))
 				{
-					pl_event_set(vars_read_thread_config->stream_event, vars_read_thread_config->data_to_send_flag);
-					if(PL_QUEUE_RV_FULL == pl_queue_send(vars_read_thread_config->read_data_send_queue, vars_read_thread_config->read_vars,
+					absl_event_set(vars_read_thread_config->stream_event, vars_read_thread_config->data_to_send_flag);
+					if(ABSL_QUEUE_RV_FULL == absl_queue_send(vars_read_thread_config->read_data_send_queue, vars_read_thread_config->read_vars,
 							*vars_read_thread_config->queue_send_wait_ms))
 					{
-						pl_debug_printf("Vars queue full!\n");
+						absl_debug_printf("Vars queue full!\n");
 						data_to_queue = true;
 					}
 				}

@@ -1,0 +1,3 @@
+[submodule "remote-sensor-schemas"]
+	path = mqtt/remote-sensor-schemas
+	url = git@gitlab.internal.ainguraiiot.com:sw/remote_sensing/remote-sensor-schemas.git

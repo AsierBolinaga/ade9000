@@ -1,0 +1,151 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "ADE9000 registers",
+    "properties": {
+        "config": {
+            "title": "",
+            "type": "object",
+            "properties": {
+                "vars": {
+                    "description": "List of ADE9000 registers to read",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "enum": [
+                        "AIRMS",
+                        "BIRMS",
+                        "CIRMS",
+                        "AVRMS",
+                        "BVRMS",
+                        "CVRMS",
+                        "APF",
+                        "BPF",
+                        "CPF",
+                        "AITHD",
+                        "BITHD",
+                        "CITHD",
+                        "AVTHD",
+                        "BVTHD",
+                        "CVTHD",
+                        "AVAHR",
+                        "BVAHR",
+                        "CVAHR",
+                        "AVARHR",
+                        "BVARHR",
+                        "CVARHR",
+                        "AWATTHR",
+                        "BWATTHR",
+                        "CWATTHR",
+                        "AFVAHR",
+                        "BFVAHR",
+                        "CFVAHR",
+                        "AFVARHR",
+                        "BFVARHR",
+                        "CFVARHR",
+                        "AFWATTHR",
+                        "BFWATTHR",
+                        "CFWATTHR",
+                        "OIA",
+                        "OIB",
+                        "OIC",
+                        "AFVANL",
+                        "BFVANL",
+                        "CFVANL",
+                        "AFVARNL",
+                        "BFVARNL",
+                        "CFVARNL",
+                        "AFWATTNL",
+                        "BFWATTNL",
+                        "CFWATTNL",
+                        "AVANL",
+                        "BVANL",
+                        "CVANL",
+                        "AVARNL",
+                        "BVARNL",
+                        "CVARNL",
+                        "AWATTNL",
+                        "BWATTNL",
+                        "CWATTNL",
+                        "DIPA",
+                        "DIPB",
+                        "DIPC",
+                        "IPPHASEA",
+                        "IPPHASEB",
+                        "IPPHASEC",
+                        "ANGL_IA_IB",
+                        "ANGL_IA_IC",
+                        "ANGL_IB_IC",
+                        "ANGL_VA_VB",
+                        "ANGL_VA_VC",
+                        "ANGL_VB_VC",
+                        "OIPHASEA",
+                        "OIPHASEB",
+                        "OIPHASEC",
+                        "APERIOD",
+                        "BPERIOD",
+                        "CPERIOD",
+                        "SWELLA",
+                        "SWELLB",
+                        "SWELLC",
+                        "VPPHASEA",
+                        "VPPHASEB",
+                        "VPPHASEC",
+                        "IPEAK",
+                        "VPEAK",
+                        "ISUMRMS",
+                        "PHASE_SEQERR"
+                    ],
+                    "title": "Vars"
+                },
+                "period": {
+                    "type": "number",
+                    "title": "Period",
+                    "default": 0.5,
+                    "description": "Acquisition period"
+                }
+            },
+            "required": ["vars", "period"]
+        },
+        "transmission": {
+            "title": "",
+            "type": "object",
+            "properties": {
+                "settings": {
+                    "title": "",
+                    "type": "object",
+                    "properties": {
+                        "IP": {
+                            "description": "Destination IP address",
+                            "type": "string",
+                            "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+                            "title": "IP"
+                        },
+                        "port": {
+                            "description": "Destination port",
+                            "title": "Port",
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 65535
+                        }
+                    },
+                    "required": ["IP", "port"]
+                },
+                "format": {
+                    "description": "Data format",
+                    "type": "string",
+                    "enum": ["binary"],
+                    "title": "Format"
+                },
+                "protocol": {
+                    "description": "Communication protocol",
+                    "type": "string",
+                    "enum": ["udp", "tcp"],
+                    "title": "Protocol"
+                }
+            },
+            "required": ["protocol", "settings", "format"]
+        }
+    },
+    "required": ["config", "transmission"]
+}

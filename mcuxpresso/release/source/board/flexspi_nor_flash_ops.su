@@ -1,0 +1,7 @@
+../source/board/flexspi_nor_flash_ops.c:186:10:flexspi_nor_flash_erase_sector	56	static
+../source/board/flexspi_nor_flash_ops.c:225:10:flexspi_nor_flash_page_program	64	static
+../source/board/flexspi_nor_flash_ops.c:612:10:sfw_flash_write	72	static
+../source/board/flexspi_nor_flash_ops.c:643:10:sfw_flash_read	8	static
+../source/board/flexspi_nor_flash_ops.c:654:10:sfw_flash_erase	72	static
+../source/board/flexspi_nor_flash_ops.c:675:10:sfw_flash_init	8	static
+../source/board/flexspi_nor_flash_ops.c:686:10:sfw_flash_read_ipc	56	static

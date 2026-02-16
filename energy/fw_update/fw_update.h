@@ -12,9 +12,9 @@
  ******************************************************************************/
 #include "system_types.h"
 
-#include "pl_types.h"
-#include "pl_event.h"
-#include "pl_queue.h"
+#include "absl_types.h"
+#include "absl_event.h"
+#include "absl_queue.h"
 
 /******************************************************************************
  * Defines
@@ -52,10 +52,10 @@ typedef struct fw_update_thread_config
 {
 	uint8_t 						nvm_conf_index;
 	fw_update_handling_conf_t		fw_update_handling_conf;
-	pl_event_t* 					fw_update_event_group;
+	absl_event_t* 					fw_update_event_group;
 	fw_update_task_states_t*		sensor_to_task_state;
 	uint32_t						erase_chunks;
-	pl_event_t*						system_event_group;
+	absl_event_t*						system_event_group;
 	uint32_t						erase_done_event;
 	uint32_t						erase_needed;
 	uint32_t						fw_update_done_flag;

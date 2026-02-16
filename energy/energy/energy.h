@@ -12,8 +12,8 @@
  ******************************************************************************/
 #include "sensors_types.h"
 
-#include "pl_event.h"
-#include "pl_queue.h"
+#include "absl_event.h"
+#include "absl_queue.h"
 
 /******************************************************************************
  * Definitions
@@ -85,20 +85,20 @@ typedef enum energy_task_states
 typedef struct energy_thread_config
 {
 	energy_sensor_init_conf_t* 	energy_sensor_conf;
-	pl_event_t*					system_events;
+	absl_event_t*					system_events;
 	uint32_t					configured_event;
 	uint32_t					reconfig_event;
 	uint32_t					wf_running;
 	uint32_t					wf_stopped;
 	uint32_t					reg_running;
 	uint32_t					reg_stopped;
-	pl_event_t*			 		energy_events;
-	pl_event_t*			 		fast_vars_events;
-	pl_event_t*			 		slow_vars_events;
+	absl_event_t*			 		energy_events;
+	absl_event_t*			 		fast_vars_events;
+	absl_event_t*			 		slow_vars_events;
 	uint32_t					vars_config;
 	uint32_t					vars_read;
-	pl_event_t*			 		fast_vars_stream_events;
-	pl_event_t*			 		slow_vars_stream_events;
+	absl_event_t*			 		fast_vars_stream_events;
+	absl_event_t*			 		slow_vars_stream_events;
 	uint32_t					stream_connect;
 	uint32_t					stream_disconnect;
 	uint32_t			 		sensor_label;

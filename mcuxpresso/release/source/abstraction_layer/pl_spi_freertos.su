@@ -1,0 +1,7 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_spi_freertos.c:41:6:LPSPI_MasterUserCallback	32	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_spi_freertos.c:176:13:absl_spi_init_master_freertos	72	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_spi_freertos.c:61:13:absl_spi_init_freertos	16	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_spi_freertos.c:99:13:absl_spi_transfer_freertos	24	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_spi_freertos.c:116:13:absl_spi_ts_transfer_freertos	24	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_spi_freertos.c:133:6:absl_spi_reset_freertos	8	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_spi_freertos.c:139:10:absl_spi_get_last_transfer_ts_freertos	0	static

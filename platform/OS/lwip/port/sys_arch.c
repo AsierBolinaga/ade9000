@@ -59,9 +59,9 @@
 #include "lwip/init.h"
 #endif
 
-#include "pl_system.h"
+#include "absl_system.h"
 
-#include "pl_thread.h"
+#include "absl_thread.h"
 
 /* ------------------------ SDK includes --------------------------------- */
 #include "fsl_common.h"
@@ -82,7 +82,7 @@ void sys_assert(const char *pcMessage)
 #if !NO_SYS
     portENTER_CRITICAL();
 #endif
-    pl_hardfault_handler(ASSERTION_ERROR);
+    absl_hardfault_handler(ASSERTION_ERROR);
 }
 
 /************************************************************************

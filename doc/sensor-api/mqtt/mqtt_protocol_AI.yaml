@@ -1,0 +1,832 @@
+asyncapi: 3.0.0
+id: 'urn:broker-backend.ai:server'
+info:
+  title: Remote sensing MQTT API
+  version: 1.0.0
+  description: >
+    The Remote sensing MQTT API describes the communication interface between
+    the sensor device and the central node. This document describes the protocol
+    from the point of view of the central node.<br> <br> The MQTT broker will be
+    hosted in the same machine as the DHCP server.<br> <br> <b>TODO:</b> It
+    remains to be seen if the DHCP server will also host a local DNS server or
+    if we will just the DHCP server address as the broker address.
+  contact:
+    name: Jon Echevarria
+    url: 'http://none'
+    email: jechevarria@ainguraiiot.com
+  license:
+    name: Closed
+  tags:
+    - name: AISensorProtocol
+      description: Aingura Insights Sensor Protocol
+    - name: mqtt
+      description: mqtt protocol
+defaultContentType: application/json
+servers:
+  production:
+    host: 'sensor-broker.ai:{port}'
+    protocol: mqtt
+    description: Aingura Insights Sensor MQTT broker
+    variables:
+      port:
+        description: >-
+          Secure connection (TLS) might be available through port 8883 someday.
+          Since this is a private network it might not be necessary to implement
+          security.
+        default: '1883'
+        enum:
+          - '1883'
+          - '8883'
+    bindings:
+      mqtt:
+        lastWill:
+          topic: 'devices/{deviceID}/state'
+          messages:
+            $ref: '#/components/messages/deviceState'
+          retain: true
+          qos: 2
+    security:
+      - $ref: '#/components/securitySchemes/userPassword'
+channels:
+  'devices/{deviceID}/discovery':
+    address: 'devices/{deviceID}/discovery'
+    messages:
+      deviceDiscovery:
+        $ref: '#/components/messages/deviceDiscovery'
+    description: The central node gets device's available sensors and services.
+    parameters:
+      deviceID:
+        $ref: '#/components/parameters/deviceID'
+  'devices/{deviceID}/manufactur':
+    address: 'devices/{deviceID}/manufactur'
+    messages:
+      deviceManufactur:
+        $ref: '#/components/messages/deviceManufactur'
+    description: Changes devices manufactur information.
+    parameters:
+      deviceID:
+        $ref: '#/components/parameters/deviceID'
+  devices/info:
+    address: devices/info
+    messages: {}
+    description: Request system info for all devices.
+  'devices/{deviceID}/info':
+    address: 'devices/{deviceID}/info'
+    messages:
+      deviceInfo:
+        $ref: '#/components/messages/deviceInfo'
+    description: Get device system info.
+    parameters:
+      deviceID:
+        $ref: '#/components/parameters/deviceID'
+  devices/timestamp:
+    address: devices/timestamp
+    messages: {}
+    description: Request timestamp for all devices.
+  'devices/{deviceID}/timestamp':
+    address: 'devices/{deviceID}/timestamp'
+    messages:
+      deviceTimestamp:
+        $ref: '#/components/messages/deviceTimestamp'
+    description: Get device timestamp info.
+    parameters:
+      deviceID:
+        $ref: '#/components/parameters/deviceID'
+  devices/sync:
+    address: devices/sync
+    messages:
+      deviceSYNC:
+        $ref: '#/components/messages/deviceSYNC'
+    description: Request SNTP synchronization.
+  deviceConfig:
+    address: 'devices/{deviceID}/config/{sensor}'
+    messages:
+      deviceConfig:
+        $ref: '#/components/messages/deviceConfig'
+    description: Send configuration data for each sensor.
+    parameters:
+      deviceID:
+        $ref: '#/components/parameters/deviceID'
+      sensor:
+        $ref: '#/components/parameters/sensor'
+  'devices/{deviceID}/state':
+    address: 'devices/{deviceID}/state'
+    messages:
+      deviceState:
+        $ref: '#/components/messages/deviceState'
+    description: Get device connectivity state.
+    parameters:
+      deviceID:
+        $ref: '#/components/parameters/deviceID'
+  'devices/{deviceID}/state/{sensor}':
+    address: 'devices/{deviceID}/state/{sensor}'
+    messages:
+      deviceStateSensor:
+        $ref: '#/components/messages/deviceStateSensor'
+    description: Get sensor state.
+    parameters:
+      deviceID:
+        $ref: '#/components/parameters/deviceID'
+      sensor:
+        $ref: '#/components/parameters/sensor'
+  'devices/{deviceID}/state/{sensor}/{service}':
+    address: 'devices/{deviceID}/state/{sensor}/{service}'
+    messages:
+      deviceStateSensorService:
+        $ref: '#/components/messages/deviceStateSensorService'
+    description: Get service state.
+    parameters:
+      deviceID:
+        $ref: '#/components/parameters/deviceID'
+      sensor:
+        $ref: '#/components/parameters/sensor'
+      service:
+        $ref: '#/components/parameters/service'
+  'devices/{deviceID}/alerts':
+    address: 'devices/{deviceID}/alerts'
+    messages:
+      deviceAlerts:
+        $ref: '#/components/messages/deviceAlerts'
+    description: The device notifies alerts or events.
+    parameters:
+      deviceID:
+        $ref: '#/components/parameters/deviceID'
+  startService:
+    address: 'devices/{deviceID}/cmd/start/{sensor}/{service}'
+    messages:
+      startService:
+        $ref: '#/components/messages/startService'
+    description: Start sending data. Body has the channel of communication info.
+    parameters:
+      deviceID:
+        $ref: '#/components/parameters/deviceID'
+      sensor:
+        $ref: '#/components/parameters/sensor'
+      service:
+        $ref: '#/components/parameters/service'
+  'devices/{deviceID}/cmd/stop/{sensor}/{service}':
+    address: 'devices/{deviceID}/cmd/stop/{sensor}/{service}'
+    messages:
+      stopService:
+        $ref: '#/components/messages/stopService'
+    description: Stop sending data.
+    parameters:
+      deviceID:
+        $ref: '#/components/parameters/deviceID'
+      sensor:
+        $ref: '#/components/parameters/sensor'
+      service:
+        $ref: '#/components/parameters/service'
+  'devices/{deviceID}/cmd/reset/{sensor}':
+    address: 'devices/{deviceID}/cmd/reset/{sensor}'
+    messages:
+      deviceResetCfgSensor:
+        $ref: '#/components/messages/deviceResetCfgSensor'
+    description: Reset sensor config.
+    parameters:
+      deviceID:
+        $ref: '#/components/parameters/deviceID'
+      sensor:
+        $ref: '#/components/parameters/sensor'
+  'devices/{deviceID}/cmd/reset':
+    address: 'devices/{deviceID}/cmd/reset'
+    messages:
+      deviceResetCfg:
+        $ref: '#/components/messages/deviceResetCfg'
+    description: Reset device configuration.
+    parameters:
+      deviceID:
+        $ref: '#/components/parameters/deviceID'
+  'devices/{deviceID}/cmd/reboot':
+    address: 'devices/{deviceID}/cmd/reboot'
+    messages:
+      deviceReboot:
+        $ref: '#/components/messages/deviceReboot'
+    description: Reboot device.
+    parameters:
+      deviceID:
+        $ref: '#/components/parameters/deviceID'
+  'devices/{deviceID}/update':
+    address: 'devices/{deviceID}/update'
+    messages:
+      deviceUpdate:
+        $ref: '#/components/messages/deviceUpdate'
+    description: Stop device and prepare for firmware update.
+    parameters:
+      deviceID:
+        $ref: '#/components/parameters/deviceID'
+operations:
+  deviceDiscovery:
+    action: send
+    channel:
+      $ref: '#/channels/devices~1{deviceID}~1discovery'
+    summary: Suscribe to information of the device
+    traits:
+      - $ref: '#/components/operationTraits/mqttRetainQos2'
+    messages:
+      - $ref: '#/channels/devices~1{deviceID}~1discovery/messages/deviceDiscovery'
+  deviceManufactur:
+    action: send
+    channel:
+      $ref: '#/channels/devices~1{deviceID}~1manufactur'
+    summary: Change device manufactur inforamtion
+    traits:
+      - $ref: '#/components/operationTraits/mqttRetainQos2'
+    messages:
+      - $ref: '#/channels/devices~1{deviceID}~1manufactur/messages/deviceManufactur'
+  reqDeviceInfo:
+    action: receive
+    channel:
+      $ref: '#/channels/devices~1info'
+    summary: Ask for system info
+    traits:
+      - $ref: '#/components/operationTraits/mqttNoRetainQos2'
+  deviceInfo:
+    action: send
+    channel:
+      $ref: '#/channels/devices~1{deviceID}~1info'
+    summary: Get system info
+    traits:
+      - $ref: '#/components/operationTraits/mqttNoRetainQos2'
+    messages:
+      - $ref: '#/channels/devices~1{deviceID}~1info/messages/deviceInfo'
+  reqTimestamp:
+    action: receive
+    channel:
+      $ref: '#/channels/devices~1timestamp'
+    traits:
+      - $ref: '#/components/operationTraits/mqttNoRetainQos2'
+  deviceTimestamp:
+    action: send
+    channel:
+      $ref: '#/channels/devices~1{deviceID}~1timestamp'
+    summary: Get timestamp
+    traits:
+      - $ref: '#/components/operationTraits/mqttNoRetainQos2'
+    messages:
+      - $ref: '#/channels/devices~1{deviceID}~1timestamp/messages/deviceTimestamp'
+  deviceSYNC:
+    action: receive
+    channel:
+      $ref: '#/channels/devices~1sync'
+    summary: Request SNTP synchronization.
+    traits:
+      - $ref: '#/components/operationTraits/mqttNoRetainQos2'
+    messages:
+      - $ref: '#/channels/devices~1sync/messages/deviceSYNC'
+  deviceConfig:
+    action: receive
+    channel:
+      $ref: '#/channels/deviceConfig'
+    summary: Send configuration data necessary to run as intended
+    traits:
+      - $ref: '#/components/operationTraits/mqttNoRetainQos2'
+  deviceState:
+    action: send
+    channel:
+      $ref: '#/channels/devices~1{deviceID}~1state'
+    summary: Get connectivity of the device
+    description: |
+      The offline state will be handled by the MQTT <b><i>will</i></b> message.
+    messages:
+      - $ref: '#/channels/devices~1{deviceID}~1state/messages/deviceState'
+  deviceStateSensor:
+    action: send
+    channel:
+      $ref: '#/channels/devices~1{deviceID}~1state~1{sensor}'
+    summary: Get state of the sensor
+    traits:
+      - $ref: '#/components/operationTraits/mqttRetainQos2'
+    messages:
+      - $ref: >-
+          #/channels/devices~1{deviceID}~1state~1{sensor}/messages/deviceStateSensor
+  deviceStateSensorService:
+    action: send
+    channel:
+      $ref: '#/channels/devices~1{deviceID}~1state~1{sensor}~1{service}'
+    summary: Get state of the service
+    traits:
+      - $ref: '#/components/operationTraits/mqttRetainQos2'
+    messages:
+      - $ref: >-
+          #/channels/devices~1{deviceID}~1state~1{sensor}~1{service}/messages/deviceStateSensorService
+  deviceAlerts:
+    action: send
+    channel:
+      $ref: '#/channels/devices~1{deviceID}~1alerts'
+    summary: Informs about any alert or event that may have happened
+    traits:
+      - $ref: '#/components/operationTraits/mqttNoRetainQos2'
+    messages:
+      - $ref: '#/channels/devices~1{deviceID}~1alerts/messages/deviceAlerts'
+  startService:
+    action: receive
+    channel:
+      $ref: '#/channels/startService'
+    summary: Begin sending data
+    description: Start service.
+    traits:
+      - $ref: '#/components/operationTraits/mqttNoRetainQos2'
+  stopService:
+    action: receive
+    channel:
+      $ref: '#/channels/devices~1{deviceID}~1cmd~1stop~1{sensor}~1{service}'
+    summary: Finish sending data
+    description: Stop service.
+    traits:
+      - $ref: '#/components/operationTraits/mqttNoRetainQos2'
+    messages:
+      - $ref: >-
+          #/channels/devices~1{deviceID}~1cmd~1stop~1{sensor}~1{service}/messages/stopService
+  deviceResetCfgSensor:
+    action: receive
+    channel:
+      $ref: '#/channels/devices~1{deviceID}~1cmd~1reset~1{sensor}'
+    summary: Reset specific sensor configuration
+    traits:
+      - $ref: '#/components/operationTraits/mqttNoRetainQos2'
+    messages:
+      - $ref: >-
+          #/channels/devices~1{deviceID}~1cmd~1reset~1{sensor}/messages/deviceResetCfgSensor
+  deviceResetCfg:
+    action: receive
+    channel:
+      $ref: '#/channels/devices~1{deviceID}~1cmd~1reset'
+    summary: Reset specific device configuration
+    traits:
+      - $ref: '#/components/operationTraits/mqttNoRetainQos2'
+    messages:
+      - $ref: '#/channels/devices~1{deviceID}~1cmd~1reset/messages/deviceResetCfg'
+  deviceReboot:
+    action: receive
+    channel:
+      $ref: '#/channels/devices~1{deviceID}~1cmd~1reboot'
+    summary: Reboot specific device
+    traits:
+      - $ref: '#/components/operationTraits/mqttNoRetainQos2'
+    messages:
+      - $ref: '#/channels/devices~1{deviceID}~1cmd~1reboot/messages/deviceReboot'
+  deviceUpdate:
+    action: receive
+    channel:
+      $ref: '#/channels/devices~1{deviceID}~1update'
+    summary: Update device
+    traits:
+      - $ref: '#/components/operationTraits/mqttNoRetainQos2'
+    messages:
+      - $ref: '#/channels/devices~1{deviceID}~1update/messages/deviceUpdate'
+components:
+  messages:
+    deviceDiscovery:
+      name: Discovery
+      title: Device discovery
+      summary: Announces its characteristics to the server
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/deviceDiscoveryPayload'
+    deviceManufactur:
+      name: Manufactur
+      title: Device manufactur
+      summary: Receives new manufactur information for the device
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/deviceManufacturPayload'
+    deviceInfo:
+      name: deviceInfo
+      title: System information
+      summary: Receives system info for a device
+      contentType: application/json
+      payload:
+        oneOf:
+          - $ref: '#/components/schemas/deviceInfoPayload'
+    deviceTimestamp:
+      name: deviceTimestamp
+      title: Get current timestamp
+      summary: Receives timestamp data for a device
+      contentType: application/json
+      payload:
+        oneOf:
+          - $ref: '#/components/schemas/deviceTimestampPayload'
+    deviceSYNC:
+      name: deviceSYNC
+      title: Synchronization SNTP
+      summary: Receives configuration data for a sensor
+      contentType: application/json
+      payload:
+        oneOf:
+          - $ref: '#/components/schemas/deviceSYNCPayload'
+    deviceState:
+      name: deviceState
+      title: Device state
+      summary: Shares its state with the server
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/deviceStatePayload'
+    deviceStateSensor:
+      name: deviceStateSensor
+      title: Device state
+      summary: Shares its state with the server
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/deviceStateSensorPayload'
+    deviceStateSensorService:
+      name: deviceStateSensorService
+      title: Device state
+      summary: Shares its state with the server
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/deviceStateSensorServicePayload'
+    deviceAlerts:
+      name: deviceAlerts
+      title: Device alerts
+      summary: Notifies any alerts that happend in the system
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/deviceAlertPayload'
+    stopService:
+      name: stopService
+      title: Stop service
+      summary: Stops the received service
+      contentType: none
+    deviceReboot:
+      name: deviceReboot
+      title: Reset the device
+      summary: Reset the device
+      contentType: none
+    deviceResetCfg:
+      name: deviceResetCfg
+      title: Reset device configuration
+      summary: Reset device configuration
+      contentType: none
+    deviceResetCfgSensor:
+      name: deviceResetCfgSensor
+      title: Reset sensor configuration
+      summary: Reset sensor configuration
+      contentType: none
+    deviceUpdate:
+      name: deviceUpdate
+      title: Update device
+      summary: Update device
+      contentType: application/octet-stream
+    deviceConfig:
+      name: deviceConfig
+      title: Configuration
+      summary: Receives configuration data for a sensor
+      description: The payload may contain different fields depending on the sensor type.
+      contentType: application/json
+      payload:
+        schemaFormat: application/schema+json;version=draft-07
+        schema:
+          $ref: './schemas.yaml#/sensors'
+    startService:
+      name: startService
+      title: Start command
+      summary: Configures and starts the service
+      contentType: application/json
+      payload:
+        schemaFormat: application/schema+json;version=draft-07
+        schema:
+          $ref: './schemas.yaml#/services'
+  schemas:
+    deviceDiscoveryPayload:
+      type: object
+      properties:
+        model:
+          description: Device model
+          type: string
+        fw:
+          description: Firmware version
+          type: string
+        sensors:
+          description: List of available sensors
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                description: Name of sensor
+                type: string
+              services:
+                description: The services that the sensor provides
+                type: array
+                items:
+                  type: string
+      example:
+        model: energy
+        fw: 1.0.0+alpha2.3.gdf4c25f+d20240425
+        sensors:
+          - name: ade9000
+            services:
+              - raw
+              - registers
+    deviceManufacturPayload:
+      type: object
+      minProperties: 1
+      additionalProperties: true
+      properties:
+        id:
+          description: Device ID number
+          type: string
+        mac:
+          description: Device MAC adress
+          type: string
+        model:
+          description: Device model
+          type: string
+          enum:
+            - energy
+            - iepe
+            - mems
+        hw_version:
+          description: List of boards and hw versions
+          type: array
+          items:
+            type: object
+            properties:
+              board:
+                description: Board model name
+                type: string
+              serial:
+                description: Board serial number
+                type: string
+              manufacturer:
+                description: Board manufacturer
+                type: string
+              hwversion:
+                description: Board hardware version
+                type: string
+      example:
+        id: 1-002531
+        mac: 00:60:37:00:00:EF
+        model: energy
+        hw_version:
+          - board: ADSN4
+            serial: 3
+            manufacturer: Nu10
+            hwversion: 1.2.0
+          - board: DIEN1
+            serial: AIN0000000DIEN124060011
+            manufacturer: MacFly
+            hwversion: 0.1.0
+    deviceSYNCPayload:
+      type: object
+      required:
+        - when
+      properties:
+        when:
+          description: When should sync take place
+          type: string
+          enum:
+            - now
+            - poll
+        interval:
+          description: Time in hours. Only if 'poll' is configured.
+          type: string
+      examples:
+        - when: poll
+          interval: 24h
+        - when: now
+    deviceTimestampPayload:
+      type: object
+      properties:
+        timestamp:
+          description: Timestamp
+          type: integer
+        unit:
+          description: Unit in which timestamp is returned.
+          type: string
+          enum:
+            - us
+          default: us
+      example:
+        timestamp: 1234567890
+        unit: us
+    deviceInfoPayload:
+      type: object
+      minProperties: 1
+      additionalProperties: true
+      properties:
+        timestamp:
+          type: integer
+        ip_adress:
+          type: string
+        temperature:
+          type: number
+          format: float
+        cpu_load:
+          type: number
+          format: float
+        heap_usage:
+          type: number
+          format: float
+        sync_interval:
+          type: string
+        fw:
+          type: string
+        manufacturing:
+          description: List of boards and hw versions
+          type: array
+          items:
+            type: object
+            properties:
+              board:
+                description: Board model name
+                type: string
+              serial:
+                description: Board serial number
+                type: string
+              manufacturer:
+                description: Board manufacturer
+                type: string
+              hwversion:
+                description: Board hardware version
+                type: string
+      example:
+        timestamp: 1234567890
+        ip_address: 192.168.100.10
+        temperature: 34.25
+        cpu_load: 56.38
+        heap_usage: 48.29
+        sync_interval: 24h
+        fw: 1.0.0+alpha2.3.gdf4c25f+d20240425
+        manufacturing:
+          - board: ADSN4
+            serial: 6
+            manufacturer: Nu10
+            hwversion: 1.2.0
+          - board: DIEN1
+            serial: AIN0000000DIEN124050001
+            manufacturer: Aisler
+            hwversion: 0.1.0
+    deviceStatePayload:
+      type: object
+      properties:
+        state:
+          description: Current device connectivity.
+          type: string
+          enum:
+            - online
+            - offline
+            - failure
+        errors:
+          description: Optional. List of errors
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                description: Error code.
+                type: integer
+              description:
+                description: Error description.
+                type: string
+      example:
+        state: online
+        errors:
+          - code: 1
+            description: Example error 1
+          - code: 2
+            description: Example error 2
+    deviceStateSensorPayload:
+      type: object
+      properties:
+        state:
+          description: Current sensor state.
+          type: string
+          enum:
+            - idle
+            - configured
+            - failure
+        errors:
+          description: Optional. List of errors
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                description: Error code.
+                type: integer
+              description:
+                description: Error description.
+                type: string
+      example:
+        state: idle
+        errors:
+          - code: 1
+            description: Example error 1
+          - code: 2
+            description: Example error 2
+    deviceStateSensorServicePayload:
+      type: object
+      properties:
+        state:
+          description: Current service state.
+          type: string
+          enum:
+            - idle
+            - running
+            - failure
+        errors:
+          description: Optional. List of errors
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                description: Error code.
+                type: integer
+              description:
+                description: Error description.
+                type: string
+      example:
+        state: idle
+        errors:
+          - code: 1
+            description: Example error 1
+          - code: 2
+            description: Example error 2
+    deviceAlertPayload:
+      type: array
+      items:
+        type: object
+        properties:
+          timestamp:
+            description: Timestamp of alert or event
+            type: integer
+          domain:
+            description: System or sensor alert
+            type: string
+            enum:
+              - system
+              - sensor
+              - service
+          source:
+            description: Optional field to define where the alert originated
+            type: string
+          code:
+            description: Alert code
+            type: integer
+          description:
+            description: Detailed description of alert or event
+            type: string
+          level:
+            description: Alert level
+            type: string
+            enum:
+              - info
+              - warning
+      example:
+        - timestamp: 1652010309210093
+          level: info
+          code: 13
+          description: FW update done
+          domain: system
+        - timestamp: 1652010309210093
+          level: info
+          code: 25
+          description: ADE9000 has been reconfigured
+          domain: sensor
+          source: ade9000
+        - timestamp: 1652010346902658
+          level: warning
+          code: 34
+          description: UDP data could not be send
+          domain: service
+          source: ade9000/raw
+  securitySchemes:
+    userPassword:
+      type: userPassword
+      description: >-
+        Pre-shared user/password style authentication. Not strictly for
+        security, but to avoid devices not designed to work with this broker to
+        publish or subscribe to unexpected topics.
+  parameters:
+    deviceID:
+      description: >-
+        Client device unique ID. E.g. MAC address to match with leased IP
+        address from the DHCP server.
+    sensor:
+      description: Sensor name.
+    service:
+      description: Service name.
+  operationTraits:
+    mqttNoRetainQos2:
+      bindings:
+        mqtt:
+          retain: false
+          qos: 2
+    mqttNoRetainQos1:
+      bindings:
+        mqtt:
+          retain: false
+          qos: 1
+    mqttRetainQos1:
+      bindings:
+        mqtt:
+          retain: true
+          qos: 1
+    mqttRetainQos2:
+      bindings:
+        mqtt:
+          retain: true
+          qos: 2

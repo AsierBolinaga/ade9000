@@ -1,0 +1,4 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/OS/lwip/src/netif/bridgeif_fdb.c:180:1:bridgeif_age_tmr	24	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/OS/lwip/src/netif/bridgeif_fdb.c:76:1:bridgeif_fdb_update_src	24	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/OS/lwip/src/netif/bridgeif_fdb.c:128:1:bridgeif_fdb_get_dst_ports	24	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/OS/lwip/src/netif/bridgeif_fdb.c:195:1:bridgeif_fdb_init	16	static

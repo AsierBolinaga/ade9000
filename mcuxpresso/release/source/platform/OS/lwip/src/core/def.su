@@ -1,0 +1,6 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/OS/lwip/src/core/def.c:76:1:lwip_htons	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/OS/lwip/src/core/def.c:90:1:lwip_htonl	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/OS/lwip/src/core/def.c:105:1:lwip_strnstr	24	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/OS/lwip/src/core/def.c:128:1:lwip_stricmp	4	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/OS/lwip/src/core/def.c:163:1:lwip_strnicmp	16	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/OS/lwip/src/core/def.c:199:1:lwip_itoa	12	static

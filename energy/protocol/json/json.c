@@ -10,12 +10,12 @@
 
 #include "interfaces.h"
 
-#include "pl_debug.h"
-#include "pl_mutex.h"
+#include "absl_debug.h"
+#include "absl_mutex.h"
 
-#include "pl_macros.h"
+#include "absl_macros.h"
 
-static pl_mutex_t json_mutex;
+static absl_mutex_t json_mutex;
 
 static void* events_array;
 
@@ -38,7 +38,7 @@ bool json_init(void* _events_array)
 
 	cJSON_InitHooks(&json_hooks);
 
-	if(PL_MUTEX_RV_OK == pl_mutex_create(&json_mutex))
+	if(ABSL_MUTEX_RV_OK == absl_mutex_create(&json_mutex))
 	{
 		ret_val = true;
 	}
@@ -110,7 +110,7 @@ char* json_get_discovery_data(uint8_t _sensor_amount, sensor_config_t* _sensors_
 
 	cJSON_AddItemToObject(cjson_tx, "sensors", cjson_sensors);
 
-	pl_mutex_take(&json_mutex);
+	absl_mutex_take(&json_mutex);
 
 	json_buff = cJSON_Print(cjson_tx);
 
@@ -126,7 +126,7 @@ char* json_get_device_status_data(char* _status)
 	cjson_tx = cJSON_CreateObject();
 	cJSON_AddStringToObject(cjson_tx, "state", _status);
 
-	pl_mutex_take(&json_mutex);
+	absl_mutex_take(&json_mutex);
 
 	json_buff = cJSON_Print(cjson_tx);
 
@@ -162,7 +162,7 @@ char* json_get_status_data(char* _status, error_code_t* _error_codes, uint8_t _e
 
 	cJSON_AddItemToObject(cjson_tx, "errors", cjson_errors);
 
-	pl_mutex_take(&json_mutex);
+	absl_mutex_take(&json_mutex);
 
 	json_buff = cJSON_Print(cjson_tx);
 
@@ -189,7 +189,7 @@ char* json_get_system_alert_data(uint64_t _timestamp, char* _level, error_code_t
 
 	cJSON_AddItemToArray(cjson_alerts, cjson_alert);
 
-	pl_mutex_take(&json_mutex);
+	absl_mutex_take(&json_mutex);
 
 	json_buff = cJSON_Print(cjson_alerts);
 
@@ -217,7 +217,7 @@ char* json_get_sensor_service_alert_data(uint64_t _timestamp, char* _level, char
 
 	cJSON_AddItemToArray(cjson_alerts, cjson_alert);
 
-	pl_mutex_take(&json_mutex);
+	absl_mutex_take(&json_mutex);
 
 	json_buff = cJSON_Print(cjson_alerts);
 
@@ -235,7 +235,7 @@ char* json_get_time_data(uint64_t _time)
 	cJSON_AddNumberToObject(cjson_time, "timestamp", _time);
 	cJSON_AddStringToObject(cjson_time, "unit", "us");
 
-	pl_mutex_take(&json_mutex);
+	absl_mutex_take(&json_mutex);
 
 	json_buff = cJSON_Print(cjson_time);
 
@@ -276,7 +276,7 @@ char* json_get_info_data(device_status_information_t* _sensor_info, char* _fw_ve
 
 	cJSON_AddItemToObject(cjson_info, "manufacturing", cjson_hw_version);
 
-	pl_mutex_take(&json_mutex);
+	absl_mutex_take(&json_mutex);
 
 	json_buff = cJSON_Print(cjson_info);
 
@@ -293,7 +293,7 @@ char* json_get_id_data(uint32_t _id)
 
 	cJSON_AddNumberToObject(cjson_id, "ID", _id);
 
-	pl_mutex_take(&json_mutex);
+	absl_mutex_take(&json_mutex);
 
 	json_buff = cJSON_Print(cjson_id);
 
@@ -310,7 +310,7 @@ char* json_get_irq0_data(bool _irq0_detected)
 
 	cJSON_AddBoolToObject(cjson_irq0, "detected", _irq0_detected);
 
-	pl_mutex_take(&json_mutex);
+	absl_mutex_take(&json_mutex);
 
 	json_buff = cJSON_Print(cjson_irq0);
 
@@ -327,7 +327,7 @@ char* json_get_reset_data(bool _reset_done)
 
 	cJSON_AddBoolToObject(cjson_reset, "done", _reset_done);
 
-	pl_mutex_take(&json_mutex);
+	absl_mutex_take(&json_mutex);
 
 	json_buff = cJSON_Print(cjson_reset);
 
@@ -344,7 +344,7 @@ char* json_get_manufactur_written_data(bool _written)
 
 	cJSON_AddBoolToObject(cjson_manu_written, "data_written", _written);
 
-	pl_mutex_take(&json_mutex);
+	absl_mutex_take(&json_mutex);
 
 	json_buff = cJSON_Print(cjson_manu_written);
 
@@ -358,7 +358,7 @@ bool json_clear(char* _json_buff)
 	bool ret_val = false;
 	cJSON_free(_json_buff);
 
-	if(PL_MUTEX_RV_OK == pl_mutex_give(&json_mutex))
+	if(ABSL_MUTEX_RV_OK == absl_mutex_give(&json_mutex))
 	{
 		ret_val = true;
 	}

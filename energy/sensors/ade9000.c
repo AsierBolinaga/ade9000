@@ -9,19 +9,19 @@
 
 #include "interfaces.h"
 
-#include "pl_debug.h"
-#include "pl_hw_config.h"
+#include "absl_debug.h"
+#include "absl_hw_config.h"
 
-#include "pl_spi.h"
-#include "pl_mutex.h"
-#include "pl_timer.h"
-#include "pl_enet_event.h"
-#include "pl_macros.h"
-#include "pl_gpio.h"
-#include "pl_thread.h"
-#include "pl_system.h"
+#include "absl_spi.h"
+#include "absl_mutex.h"
+#include "absl_timer.h"
+#include "absl_enet_event.h"
+#include "absl_macros.h"
+#include "absl_gpio.h"
+#include "absl_thread.h"
+#include "absl_system.h"
 
-#include "pl_types.h"
+#include "absl_types.h"
 
 /*******************************************************************************
  * Definitions
@@ -310,21 +310,21 @@ static uint32_t ade9000_extract_value(uint32_t _reg_value, uint8_t _initial_bit,
 /*******************************************************************************
  * Variables
  ******************************************************************************/
-static pl_spi_t					spi_ade9000;
-static pl_spi_config_t*  		spi_ade9000_config;
+static absl_spi_t					spi_ade9000;
+static absl_spi_config_t*  		spi_ade9000_config;
 
-static pl_enet_event_t 			ade9000_irq0;
-static pl_enet_event_config_t* 	ade9000_irq0_config;
+static absl_enet_event_t 			ade9000_irq0;
+static absl_enet_event_config_t* 	ade9000_irq0_config;
 
-static pl_gpio_t 				ade9000_reset_gpio;
-static pl_gpio_config_t* 		ade9000_reset_gpio_config;
+static absl_gpio_t 				ade9000_reset_gpio;
+static absl_gpio_config_t* 		ade9000_reset_gpio_config;
 
-static pl_mutex_t	spi_buff_mutex;
+static absl_mutex_t	spi_buff_mutex;
 static uint8_t 		transmit_buffer[PAGE_SIZE_BYTES] = {0};
 static uint8_t 		receive_buffer[PAGE_SIZE_BYTES]  = {0};
 
 static bool			slow_vars_start_wait_time;
-static pl_timer_t	pl_timer_slow_vars;
+static absl_timer_t	absl_timer_slow_vars;
 
 static bool			slow_vars_running;
 static bool			slow_vars_first_read;
@@ -337,12 +337,12 @@ static ade9000_wvf_half_t wvf_half_to_expect = WVF_FIRST_HALF;
 
 static void* 		ade9000_event_info_array;
 
-static pl_event_t* 	slow_vars_event_group;
+static absl_event_t* 	slow_vars_event_group;
 static uint32_t 	read_slow_vars_event;
 
 #ifdef DEBUG_PIN
-static pl_gpio_t            debug_gpio;
-static pl_gpio_config_t*    debug_gpio_config;
+static absl_gpio_t            debug_gpio;
+static absl_gpio_config_t*    debug_gpio_config;
 #endif
 
 static float* wvf_i[PHASE_MAXNUM];
@@ -406,11 +406,11 @@ static double* i_complex[PHASE_MAXNUM] =
  ******************************************************************************/
 void ade9000_slow_vars_call(void* _arg)
 {
-	PL_UNUSED_ARG(_arg);
+	ABSL_UNUSED_ARG(_arg);
 
 	if(false == slow_vars_start_wait_time)
 	{
-		pl_event_set_fromISR(slow_vars_event_group, read_slow_vars_event);
+		absl_event_set_fromISR(slow_vars_event_group, read_slow_vars_event);
 	}
 	else
 	{
@@ -420,7 +420,7 @@ void ade9000_slow_vars_call(void* _arg)
 		{
 			ade9000_set_slow_vars_period();
 
-			pl_event_set_fromISR(slow_vars_event_group, read_slow_vars_event);
+			absl_event_set_fromISR(slow_vars_event_group, read_slow_vars_event);
 		}
 	}
 }
@@ -430,27 +430,27 @@ void ade9000_slow_vars_call(void* _arg)
  *  is coming from a reset, and it saves the trim values.
  *  After that the ade9000 is configured as needed, if needed.
  */
-bool ade9000_init(energy_sensor_init_conf_t* _ade9000_conf, pl_event_t* _event_group, uint32_t _fast_event_mask, uint32_t _slow_evet_mask)
+bool ade9000_init(energy_sensor_init_conf_t* _ade9000_conf, absl_event_t* _event_group, uint32_t _fast_event_mask, uint32_t _slow_evet_mask)
 {
 	bool return_value = false;
-	pl_time_t slowvars_start;
+	absl_time_t slowvars_start;
 
 	ade9000_event_info_array = _ade9000_conf->ade9000_events_info_array;
 
-	spi_ade9000_config 		  =	pl_config_get_spi_conf(_ade9000_conf->spi_conf_index);
-	ade9000_irq0_config 	  =	pl_config_get_enet_event_conf(_ade9000_conf->enet_event_irq0_conf_index);
-	ade9000_reset_gpio_config = pl_config_get_gpio_conf(_ade9000_conf->ade9000_reset_gpio_index);
+	spi_ade9000_config 		  =	absl_config_get_spi_conf(_ade9000_conf->spi_conf_index);
+	ade9000_irq0_config 	  =	absl_config_get_enet_event_conf(_ade9000_conf->enet_event_irq0_conf_index);
+	ade9000_reset_gpio_config = absl_config_get_gpio_conf(_ade9000_conf->ade9000_reset_gpio_index);
 
-	if(PL_SPI_RV_OK == pl_spi_init(&spi_ade9000, spi_ade9000_config, transmit_buffer, receive_buffer))
+	if(ABSL_SPI_RV_OK == absl_spi_init(&spi_ade9000, spi_ade9000_config, transmit_buffer, receive_buffer))
 	{
-		if(PL_GPIO_RV_OK == pl_gpio_init(&ade9000_reset_gpio, ade9000_reset_gpio_config, PL_GPIO_NO_INT))
+		if(ABSL_GPIO_RV_OK == absl_gpio_init(&ade9000_reset_gpio, ade9000_reset_gpio_config, ABSL_GPIO_NO_INT))
 		{
-			pl_mutex_create(&spi_buff_mutex);
-			pl_gpio_on(&ade9000_reset_gpio);
+			absl_mutex_create(&spi_buff_mutex);
+			absl_gpio_on(&ade9000_reset_gpio);
 
-			pl_enet_event_init(&ade9000_irq0, ade9000_irq0_config, _event_group, _fast_event_mask);
+			absl_enet_event_init(&ade9000_irq0, ade9000_irq0_config, _event_group, _fast_event_mask);
 
-			irq_timestamp = pl_enet_event_get_pointer_to_event_time_us(&ade9000_irq0);
+			irq_timestamp = absl_enet_event_get_pointer_to_event_time_us(&ade9000_irq0);
 
 			for(uint8_t wvf_var_index = 0; wvf_var_index < WFB_AMOUNT; wvf_var_index++)
 			{
@@ -468,13 +468,13 @@ bool ade9000_init(energy_sensor_init_conf_t* _ade9000_conf, pl_event_t* _event_g
 			slowvars_start.seconds = 1;
 			slowvars_start.nseconds = 0;
 
-			pl_timer_create(&pl_timer_slow_vars, &ade9000_slow_vars_call, NULL, slowvars_start, false, false);
+			absl_timer_create(&absl_timer_slow_vars, &ade9000_slow_vars_call, NULL, slowvars_start, false, false);
 
 #ifdef DEBUG_PIN
-			debug_gpio_config = pl_config_get_gpio_conf(_ade9000_conf->debug_gpio_index);
+			debug_gpio_config = absl_config_get_gpio_conf(_ade9000_conf->debug_gpio_index);
 
-			pl_gpio_init(&debug_gpio, debug_gpio_config, PL_GPIO_NO_INT);
-			pl_gpio_off(&debug_gpio);
+			absl_gpio_init(&debug_gpio, debug_gpio_config, ABSL_GPIO_NO_INT);
+			absl_gpio_off(&debug_gpio);
 #endif
 
 			return_value = true;
@@ -520,9 +520,9 @@ void ade9000_set_q_buff_position(ade9000_phases_t _phase, uint32_t _buf_pos)
 
 void ade9000_reboot(void)
 {
-	pl_gpio_off(&ade9000_reset_gpio);
-	pl_thread_sleep(1);
-	pl_gpio_on(&ade9000_reset_gpio);
+	absl_gpio_off(&ade9000_reset_gpio);
+	absl_thread_sleep(1);
+	absl_gpio_on(&ade9000_reset_gpio);
 }
 
 bool ade9000_startup(void)
@@ -538,10 +538,10 @@ bool ade9000_startup(void)
 			ade9000_print_config();
 			ade9000_coeficients();
 			ade9000_clear_waveform();
-			pl_debug_printf("Energy Initialized\n");
+			absl_debug_printf("Energy Initialized\n");
 
-			pl_enet_event_enable(&ade9000_irq0);
-			pl_timer_start(&pl_timer_slow_vars);
+			absl_enet_event_enable(&ade9000_irq0);
+			absl_timer_start(&absl_timer_slow_vars);
 
 			next_packet_wf_init_timestamp = 0;
 			last_obtained_power_vars_timestamp = 0;
@@ -593,7 +593,7 @@ void ade9000_continue_obtaining_fast(void)
 
 	if(ade9000_write_register(ADE9000_STATUS0, (uint8_t*)&reg))
 	{
-		pl_enet_event_enable(&ade9000_irq0);
+		absl_enet_event_enable(&ade9000_irq0);
 	}
 }
 
@@ -609,7 +609,7 @@ void ade9000_continue_obtaining_slow(void)
 		}
 		else
 		{
-			pl_timer_start(&pl_timer_slow_vars);
+			absl_timer_start(&absl_timer_slow_vars);
 		}
 	}
 	else
@@ -622,7 +622,7 @@ bool ade9000_read_waveform(void* _fast_vars_config, void* _waveform_data)
 {
 	bool	  waveform_obtained = false;
 
-	PL_UNUSED_ARG(_fast_vars_config);
+	ABSL_UNUSED_ARG(_fast_vars_config);
 
 	waveform_data_t* 	waveform_data = (waveform_data_t* )_waveform_data;
 	fast_vars_config_t*	vars_config = (fast_vars_config_t*)_fast_vars_config;
@@ -641,7 +641,7 @@ bool ade9000_read_waveform(void* _fast_vars_config, void* _waveform_data)
 					if(true == first_waveform_read)
 					{
 						ade9000_notify_system_event(ade9000_event_info_array, ADE9000_EVENTS_WAVEFORM_DATA_LOST);
-						pl_debug_printf("Fast vars diff: %lld\n", *irq_timestamp - next_packet_wf_init_timestamp);
+						absl_debug_printf("Fast vars diff: %lld\n", *irq_timestamp - next_packet_wf_init_timestamp);
 					}
 
 					waveform_data->initial_timestamp = *irq_timestamp - ADE9000_TIME_BETWEEN_IRQ_MS;
@@ -787,18 +787,18 @@ void ade9000_clear_slow_vars(void)
 	last_obtained_power_vars_timestamp = 0;
 }
 
-pl_time_t ade9000_get_event_time(void)
+absl_time_t ade9000_get_event_time(void)
 {
-	pl_time_t event_time;
+	absl_time_t event_time;
 
-	pl_enet_event_get_event_time(&ade9000_irq0, &event_time);
+	absl_enet_event_get_event_time(&ade9000_irq0, &event_time);
 
 	return event_time;
 }
 
 uint64_t ade9000_get_event_time_ns(void)
 {
-	return pl_enet_event_get_event_time_ns(&ade9000_irq0);
+	return absl_enet_event_get_event_time_ns(&ade9000_irq0);
 }
 
 static uint32_t ade9000_extract_value(uint32_t _reg_value, uint8_t _initial_bit, uint8_t _final_bit)
@@ -961,7 +961,7 @@ static void ade9000_get_data_to_send(void *_data, fast_vars_config_t* _config)
         	}
     	}
 
-		samples_index = PL_INC_INDEX(samples_index, samples_s_cycle);
+		samples_index = ABSL_INC_INDEX(samples_index, samples_s_cycle);
         p_aux += NUM_CHANNELS;
     }
 
@@ -1123,7 +1123,7 @@ static bool ade9000_quickstart(void)
 		return ret;
 	}
 
-	pl_timer_start(&pl_timer_slow_vars);
+	absl_timer_start(&absl_timer_slow_vars);
 
 	return ret;
 }
@@ -1485,14 +1485,14 @@ static bool ade9000_check_fund_freq(energy_fundamental_freq_t _fund_freq, uint32
 	if (_fund_freq == FUNDAMENTAL_FREQ_50_HZ)
 	{
 		// 50Hz
-		pl_debug_printf("OPTION: fundamental frequency 50Hz\r\n");
+		absl_debug_printf("OPTION: fundamental frequency 50Hz\r\n");
 		*_reg &= ~SELFREQ;
 		valid_fund_freq = true;
 	}
 	else if (_fund_freq == FUNDAMENTAL_FREQ_60_HZ)
 	{
 		// 60Hz
-		pl_debug_printf("OPTION: fundamental frequency 60Hz\r\n");
+		absl_debug_printf("OPTION: fundamental frequency 60Hz\r\n");
 		*_reg |= SELFREQ;
 		valid_fund_freq = true;
 	}
@@ -1512,7 +1512,7 @@ static bool ade9000_check_hw_config(energy_hw_config_t _hw_config, uint32_t* _re
 	case HW_CONF_4_WIRE_WYE_ISOLATED:
 	case HW_CONF_4_WIRE_DELTA_NEUTRAL:
 	case HW_CONF_MULTIPLE_1PH_NEUTRAL:
-		pl_debug_printf("OPTION: 4 wire wye hw configuration\r\n");
+		absl_debug_printf("OPTION: 4 wire wye hw configuration\r\n");
 		*_reg &= ~VCONSEL_111;
 		valid_hw_config = true;
 		break;
@@ -1578,13 +1578,13 @@ static void ade9000_conversion_factors(void)
 
 static void ade9000_print_config(void)
 {
-    pl_debug_printf("R1: %d\n", R1);
-    pl_debug_printf("R2: %d\n", R2);
+    absl_debug_printf("R1: %d\n", R1);
+    absl_debug_printf("R2: %d\n", R2);
 
-    pl_debug_printf("I_conversion_factor:    %.20f\n", i_factor);
-    pl_debug_printf("V_conversion_factor:    %.20f\n", v_factor);
-    pl_debug_printf("P_conversion_factor:    %.20f\n", p_factor);
-    pl_debug_printf("E_conversion_factor:    %.20f\n", e_factor);
+    absl_debug_printf("I_conversion_factor:    %.20f\n", i_factor);
+    absl_debug_printf("V_conversion_factor:    %.20f\n", v_factor);
+    absl_debug_printf("P_conversion_factor:    %.20f\n", p_factor);
+    absl_debug_printf("E_conversion_factor:    %.20f\n", e_factor);
 }
 
 static void ade9000_generate_hamming_window(void)
@@ -1679,18 +1679,18 @@ static bool ade9000_read_register(uint16_t _register, uint8_t* _read_register_da
 	bool return_value = false;
 	uint32_t bytes_len;
 
-	pl_spi_rv_t spi_rv;
+	absl_spi_rv_t spi_rv;
 
-	pl_mutex_take(&spi_buff_mutex);
+	absl_mutex_take(&spi_buff_mutex);
 
 	bytes_len = (_register >= 0x480 && _register <= 0x4FE) ? 2 : 4;
 
 	transmit_buffer[0] = (_register << 4) >> 8;
 	transmit_buffer[1] = (_register << 4) | ADE9000_READ_REGISTER;
 
-	spi_rv = pl_spi_transfer(&spi_ade9000, ADE9000_REGISTER_SIZE + bytes_len);
+	spi_rv = absl_spi_transfer(&spi_ade9000, ADE9000_REGISTER_SIZE + bytes_len);
 
-	if (PL_SPI_RV_OK == spi_rv)
+	if (ABSL_SPI_RV_OK == spi_rv)
 	{
 		for(uint8_t buff_index = 0; buff_index < bytes_len; buff_index++)
 		{
@@ -1701,11 +1701,11 @@ static bool ade9000_read_register(uint16_t _register, uint8_t* _read_register_da
 	}
 	else
 	{
-		pl_debug_printf("LPSPI master transfer completed with error.\r\n");
+		absl_debug_printf("LPSPI master transfer completed with error.\r\n");
 		ade9000_notify_system_event(ade9000_event_info_array, ADE9000_EVENTS_REGISTER_READ);
 	}
 
-	pl_mutex_give(&spi_buff_mutex);
+	absl_mutex_give(&spi_buff_mutex);
 
 	return return_value;
 }
@@ -1723,18 +1723,18 @@ static bool ade9000_ts_read_register(uint16_t _register, uint8_t* _read_register
 	bool return_value = false;
 	uint32_t bytes_len;
 
-	pl_spi_rv_t spi_rv;
+	absl_spi_rv_t spi_rv;
 
-	pl_mutex_take(&spi_buff_mutex);
+	absl_mutex_take(&spi_buff_mutex);
 
 	bytes_len = (_register >= 0x480 && _register <= 0x4FE) ? 2 : 4;
 
 	transmit_buffer[0] = (_register << 4) >> 8;
 	transmit_buffer[1] = (_register << 4) | ADE9000_READ_REGISTER;
 
-	spi_rv = pl_spi_ts_transfer(&spi_ade9000, ADE9000_REGISTER_SIZE + bytes_len, _timestamp);
+	spi_rv = absl_spi_ts_transfer(&spi_ade9000, ADE9000_REGISTER_SIZE + bytes_len, _timestamp);
 
-	if (PL_SPI_RV_OK == spi_rv)
+	if (ABSL_SPI_RV_OK == spi_rv)
 	{
 		for(uint8_t buff_index = 0; buff_index < bytes_len; buff_index++)
 		{
@@ -1745,11 +1745,11 @@ static bool ade9000_ts_read_register(uint16_t _register, uint8_t* _read_register
 	}
 	else
 	{
-		pl_debug_printf("LPSPI master transfer completed with error.\r\n");
+		absl_debug_printf("LPSPI master transfer completed with error.\r\n");
 		ade9000_notify_system_event(ade9000_event_info_array, ADE9000_EVENTS_REGISTER_READ);
 	}
 
-	pl_mutex_give(&spi_buff_mutex);
+	absl_mutex_give(&spi_buff_mutex);
 
 	return return_value;
 }
@@ -1767,9 +1767,9 @@ static bool ade9000_write_register(uint16_t _register, uint8_t* _write_register_
 	uint32_t	read_value = 0;
 	uint32_t 	bytes_len;
 
-    pl_spi_rv_t spi_rv;
+    absl_spi_rv_t spi_rv;
 
-    pl_mutex_take(&spi_buff_mutex);
+    absl_mutex_take(&spi_buff_mutex);
 
 	bytes_len = (_register >= 0x480 && _register <= 0x4FE) ? 2 : 4;
 
@@ -1781,9 +1781,9 @@ static bool ade9000_write_register(uint16_t _register, uint8_t* _write_register_
 		transmit_buffer[ADE9000_REGISTER_SIZE + buff_index] = _write_register_data[(bytes_len - 1) -  buff_index];
 	}
 
-	spi_rv = pl_spi_transfer(&spi_ade9000, ADE9000_REGISTER_SIZE + bytes_len);
-	pl_mutex_give(&spi_buff_mutex);
-	if (PL_SPI_RV_OK == spi_rv)
+	spi_rv = absl_spi_transfer(&spi_ade9000, ADE9000_REGISTER_SIZE + bytes_len);
+	absl_mutex_give(&spi_buff_mutex);
+	if (ABSL_SPI_RV_OK == spi_rv)
 	{
 		if(true == ade9000_read_register(_register, (uint8_t *)&read_value))
 		{
@@ -1796,18 +1796,18 @@ static bool ade9000_write_register(uint16_t _register, uint8_t* _write_register_
 			}
 			else
 			{
-				pl_debug_printf("Read register data differs from the data written, make sure that the ADE9000 is correctly connected.\r\n");
+				absl_debug_printf("Read register data differs from the data written, make sure that the ADE9000 is correctly connected.\r\n");
 				ade9000_notify_system_event(ade9000_event_info_array, ADE9000_EVENTS_REGISTER_NOT_WRITTEN);
 			}
 		}
 		else
 		{
-			pl_debug_printf("LPSPI master transfer completed with error.\r\n");
+			absl_debug_printf("LPSPI master transfer completed with error.\r\n");
 		}
 	}
 	else
 	{
-		pl_debug_printf("LPSPI master transfer completed with error.\r\n");
+		absl_debug_printf("LPSPI master transfer completed with error.\r\n");
 		ade9000_notify_system_event(ade9000_event_info_array, ADE9000_EVENTS_REGISTER_WRITE);
 	}
 
@@ -1863,7 +1863,7 @@ static bool ade9000_check_written_register(uint16_t _register, uint32_t _written
 static bool ade9000_read_burst(uint16_t _page, uint8_t* _buff)
 {
 	bool 		return_value = false;
-	pl_spi_rv_t spi_rv;
+	absl_spi_rv_t spi_rv;
 	uint16_t 	page_cmd = 0;
 	uint16_t 	tmp = 0;
 
@@ -1896,15 +1896,15 @@ static bool ade9000_read_burst(uint16_t _page, uint8_t* _buff)
 		break;
 	}
 
-	pl_mutex_take(&spi_buff_mutex);
+	absl_mutex_take(&spi_buff_mutex);
 	tmp = (page_cmd << 4) | ADE9000_READ_REGISTER;
 
 	transmit_buffer[0] = (uint8_t)(tmp >> 8);
 	transmit_buffer[1] = (uint8_t)tmp;
 
-	spi_rv = pl_spi_transfer(&spi_ade9000, PAGE_SIZE_BYTES);
+	spi_rv = absl_spi_transfer(&spi_ade9000, PAGE_SIZE_BYTES);
 
-	if (PL_SPI_RV_OK == spi_rv)
+	if (ABSL_SPI_RV_OK == spi_rv)
 	{
 		memcpy(_buff, &receive_buffer[ADE9000_REGISTER_SIZE], WAVEFORM_BUFF_SIZE);
 		ade9000_data_rearrange(_buff, WAVEFORM_BUFF_SIZE/4);
@@ -1913,11 +1913,11 @@ static bool ade9000_read_burst(uint16_t _page, uint8_t* _buff)
 	}
 	else
 	{
-		pl_debug_printf("LPSPI master transfer completed with error.\r\n");
+		absl_debug_printf("LPSPI master transfer completed with error.\r\n");
 		ade9000_notify_system_event(ade9000_event_info_array, ADE9000_EVENTS_BURST_READ);
 	}
 
-	pl_mutex_give(&spi_buff_mutex);
+	absl_mutex_give(&spi_buff_mutex);
 
 	return return_value;
 }
@@ -2214,7 +2214,7 @@ static float ade9000_apply_period(int32_t _data)
 
 static void ade9000_set_slow_vars_period(void)
 {
-	pl_time_t slowvars_read_time;
+	absl_time_t slowvars_read_time;
 
 	float slow_vars_period = ade9000_get_slow_vars_period();
 
@@ -2224,7 +2224,7 @@ static void ade9000_set_slow_vars_period(void)
 	slowvars_read_time.seconds = sec;
 	slowvars_read_time.nseconds = nsec;
 
-	pl_timer_change(&pl_timer_slow_vars, slowvars_read_time, true);
+	absl_timer_change(&absl_timer_slow_vars, slowvars_read_time, true);
 }
 
 void ade9000_calc_i(ade9000_phases_t _phase, int _sample, int32_t* _data_pos)
@@ -2284,7 +2284,7 @@ void ade9000_calc_powers(ade9000_phases_t _phase, int _sample, int32_t* _data_po
 	float aux_i;
 	float aux_v;
 
-	PL_UNUSED_ARG(_sample);
+	ABSL_UNUSED_ARG(_sample);
 
 	aux_i = ade9000_apply_intensity(*(_data_pos + i_phases[_phase]));
 	ade9000_fill_samples_buffers(aux_i, &pwr_calc[i_phases[_phase]]);

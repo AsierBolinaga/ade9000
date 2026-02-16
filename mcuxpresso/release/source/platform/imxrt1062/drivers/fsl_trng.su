@@ -1,0 +1,5 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/drivers/fsl_trng.c:1278:17:trng_GetInstance.part.0	8	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/drivers/fsl_trng.c:1340:10:TRNG_GetDefaultConfig	4	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/drivers/fsl_trng.c:1832:10:TRNG_Init	16	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/drivers/fsl_trng.c:1891:6:TRNG_Deinit	8	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/drivers/fsl_trng.c:1926:10:TRNG_GetRandomData	8	static

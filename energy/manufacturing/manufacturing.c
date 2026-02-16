@@ -10,18 +10,18 @@
 #include "debug_shell.h"
 #include "interfaces.h"
 
-#include "pl_debug.h"
+#include "absl_debug.h"
 
-#include "pl_debug.h"
-#include "pl_thread.h"
-#include "pl_hw_config.h"
-#include "pl_macros.h"
-#include "pl_nvm.h"
-#include "pl_gpio.h"
-#include "pl_timer.h"
-#include "pl_system.h"
+#include "absl_debug.h"
+#include "absl_thread.h"
+#include "absl_hw_config.h"
+#include "absl_macros.h"
+#include "absl_nvm.h"
+#include "absl_gpio.h"
+#include "absl_timer.h"
+#include "absl_system.h"
 
-#include "pl_hw_config.h"
+#include "absl_hw_config.h"
 
 /*******************************************************************************
  * Definitions
@@ -55,13 +55,13 @@ typedef enum manufacturing_cmds
 /*******************************************************************************
  * Variables
  ******************************************************************************/
-static pl_event_t			manufacturing_events;
+static absl_event_t			manufacturing_events;
 
-static pl_nvm_t*		    manufacturing_nvm;
+static absl_nvm_t*		    manufacturing_nvm;
 
 static uint32_t             manufacturing_sector_index;
 
-static pl_timer_t			manufacturing_timeout;
+static absl_timer_t			manufacturing_timeout;
 
 static manufacturing_t  	manufacturing_data;
 
@@ -82,7 +82,7 @@ static debug_shell_config_t debug_shell_config =
 	false
 };
 
-static pl_thread_t debug_shell_thread;
+static absl_thread_t debug_shell_thread;
 
 /*******************************************************************************
  * Prototypes
@@ -142,14 +142,14 @@ debug_shell_cmd_t manufacturing_cmds[CMDS_MAXVALUE] =
  ******************************************************************************/
 static void manufacturing_timeout_call(void* arg)
 {
-	PL_UNUSED_ARG(arg);
+	ABSL_UNUSED_ARG(arg);
 
-	pl_event_set_fromISR(&manufacturing_events, MANUFACTURING_DEFAULT_DATA | MANUFACTURING_EXIT);
+	absl_event_set_fromISR(&manufacturing_events, MANUFACTURING_DEFAULT_DATA | MANUFACTURING_EXIT);
 }
 
 void manufacturing_initialize(manufacturing_config_t* _manufacturing_config)
 {
-	pl_time_t manufaturing_timeout_time;
+	absl_time_t manufaturing_timeout_time;
 
 	manufacturing_nvm = _manufacturing_config->nvm;
     manufacturing_sector_index = _manufacturing_config->sector_index;
@@ -157,12 +157,12 @@ void manufacturing_initialize(manufacturing_config_t* _manufacturing_config)
     system_model = _manufacturing_config->system_model;
     event_info_array = _manufacturing_config->manufacturing_events_info_array;
 
-    pl_event_create(&manufacturing_events);
+    absl_event_create(&manufacturing_events);
 
     manufaturing_timeout_time.seconds = 30;
     manufaturing_timeout_time.nseconds = 0;
 
-    pl_timer_create(&manufacturing_timeout, &manufacturing_timeout_call, NULL, manufaturing_timeout_time, false, false);
+    absl_timer_create(&manufacturing_timeout, &manufacturing_timeout_call, NULL, manufaturing_timeout_time, false, false);
 
 	memset(&manufacturing_data, 0, sizeof(manufacturing_t));
 
@@ -175,7 +175,7 @@ bool manufacturing_get_data(manufacturing_t* _manufacturing_data)
 
     if(false == manufacturing_read())
 	{
-		pl_debug_printf("Manufacturing data is invalid\n");
+		absl_debug_printf("Manufacturing data is invalid\n");
 	}
 	else
 	{
@@ -194,14 +194,14 @@ void manufacturing(manufacturing_t* _manufacturing_data)
 
     if(true == manufacturing_initialized)
     {
-        pl_timer_start(&manufacturing_timeout);
+        absl_timer_start(&manufacturing_timeout);
         manufacturing_execute();
 
         while(!exit)
         {
-            pl_event_wait_freertos(&manufacturing_events, MANUFACTURING_EVENTS, &events);
+            absl_event_wait_freertos(&manufacturing_events, MANUFACTURING_EVENTS, &events);
 
-            pl_timer_stop(&manufacturing_timeout);
+            absl_timer_stop(&manufacturing_timeout);
 
             if(MANUFACTURING_READ_DATA == (events & MANUFACTURING_READ_DATA))
             {
@@ -223,7 +223,7 @@ void manufacturing(manufacturing_t* _manufacturing_data)
             {
 				if(false == manufacturing_read())
 				{
-					pl_debug_printf("Invalid manufacturing data, cannot exit until it is correctly fulfilled!\r\n");
+					absl_debug_printf("Invalid manufacturing data, cannot exit until it is correctly fulfilled!\r\n");
 				}
 				else
 				{
@@ -236,7 +236,7 @@ void manufacturing(manufacturing_t* _manufacturing_data)
     }
     else
     {
-        pl_hardfault_handler(MANU_NOT_INIT_ERROR);
+        absl_hardfault_handler(MANU_NOT_INIT_ERROR);
     }
 }
 
@@ -259,19 +259,19 @@ static void manufacturing_execute(void)
 {
     if(!debug_shell_initialize(&debug_shell_config))
     {
-        pl_debug_printf("Debug shell initialization failed!\r\n");
-        pl_hardfault_handler(DEBUG_SHELL_NOT_INIT_ERROR);
+        absl_debug_printf("Debug shell initialization failed!\r\n");
+        absl_hardfault_handler(DEBUG_SHELL_NOT_INIT_ERROR);
     }
 
     debug_shell_add_commads(manufacturing_cmds, CMDS_MAXVALUE);
 
-    pl_debug_printf("Spawning threads!\n");
+    absl_debug_printf("Spawning threads!\n");
 
-    if (PL_THREAD_RV_OK != pl_thread_create(&debug_shell_thread, "Debug shell", debug_shell,
+    if (ABSL_THREAD_RV_OK != absl_thread_create(&debug_shell_thread, "Debug shell", debug_shell,
                         DEBUG_SHELL_PRIORITY, DEBUG_SHELL_STACK_SIZE, NULL))
     {
-        pl_debug_printf("Debug shell creation failed!.\r\n");
-        pl_hardfault_handler(THREAD_CREATE_ERROR);
+        absl_debug_printf("Debug shell creation failed!.\r\n");
+        absl_hardfault_handler(THREAD_CREATE_ERROR);
     }
 
     manufacturing_handler_show_menu();
@@ -281,7 +281,7 @@ static void manufacturing_handler_show_menu(void)
 {
     for(uint32_t commands_index = 0; commands_index < CMDS_MAXVALUE; commands_index++)
 	{
-		pl_debug_printf("%s", manufacturing_cmds[commands_index].descriptor);
+		absl_debug_printf("%s", manufacturing_cmds[commands_index].descriptor);
 	}
 }
 
@@ -289,17 +289,17 @@ static bool manufacturing_read(void)
 {
     bool data_available = false;
 
-    pl_nvm_read(manufacturing_nvm, manufacturing_sector_index, 0,
+    absl_nvm_read(manufacturing_nvm, manufacturing_sector_index, 0,
                 sizeof(manufacturing_t), (void*)&manufacturing_data);
 
 	if(true == manufacturing_check_data(&manufacturing_data))
 	{
-		pl_debug_printf("\nActual manufacturing data:\n");
+		absl_debug_printf("\nActual manufacturing data:\n");
         data_available = true;
     }
 	else
 	{
-		pl_debug_printf("\nThere is missing manufacturing data:\n");
+		absl_debug_printf("\nThere is missing manufacturing data:\n");
 	}
 
 	manufaturing_print_data(&manufacturing_data);
@@ -313,16 +313,16 @@ static void manufacturing_write(void)
 
 	volatile uint32_t primask = DisableGlobalIRQ();
 
-    pl_nvm_erase(manufacturing_nvm, manufacturing_sector_index, 0, sizeof(manufacturing_t));
-    pl_nvm_write(manufacturing_nvm, manufacturing_sector_index, 0,
+    absl_nvm_erase(manufacturing_nvm, manufacturing_sector_index, 0, sizeof(manufacturing_t));
+    absl_nvm_write(manufacturing_nvm, manufacturing_sector_index, 0,
     		     sizeof(manufacturing_t),(void*)& manufacturing_data);
 
 	EnableGlobalIRQ(primask);
 
-	pl_nvm_read(manufacturing_nvm, manufacturing_sector_index, 0,
+	absl_nvm_read(manufacturing_nvm, manufacturing_sector_index, 0,
 	                sizeof(manufacturing_t), (void*)&written_manufacturing_data);
 
-	pl_debug_printf("\nWritten data:\n");
+	absl_debug_printf("\nWritten data:\n");
 	manufaturing_print_data(&written_manufacturing_data);
 }
 
@@ -336,7 +336,7 @@ static void manufacturing_delete(void)
 {   
     volatile uint32_t primask = DisableGlobalIRQ();
 
-	pl_nvm_erase(manufacturing_nvm, manufacturing_sector_index, 0, sizeof(manufacturing_t));
+	absl_nvm_erase(manufacturing_nvm, manufacturing_sector_index, 0, sizeof(manufacturing_t));
 
 	EnableGlobalIRQ(primask);
 
@@ -552,7 +552,7 @@ static bool manufacturing_check_mac(uint8_t* _mac)
 {
     bool valid_num = true;
 
-    PL_UNUSED_ARG(_mac);
+    ABSL_UNUSED_ARG(_mac);
 
     return valid_num;
 }
@@ -740,53 +740,53 @@ static void manufacturing_write_cmd(char** _arg)
 		}
 	}
 
-    pl_event_set(&manufacturing_events, MANUFACTURING_WRITE_DATA);
+    absl_event_set(&manufacturing_events, MANUFACTURING_WRITE_DATA);
 }
 
 static void manufacturing_read_cmd(char** _arg)
 {
-	PL_UNUSED_ARG(_arg);
+	ABSL_UNUSED_ARG(_arg);
 
-    pl_event_set(&manufacturing_events, MANUFACTURING_READ_DATA);
+    absl_event_set(&manufacturing_events, MANUFACTURING_READ_DATA);
 }
 
 static void manufacturing_delete_cmd(char** _arg)
 {
-	PL_UNUSED_ARG(_arg);
+	ABSL_UNUSED_ARG(_arg);
 
-    pl_event_set(&manufacturing_events, MANUFACTURING_DELETE_DATA);
+    absl_event_set(&manufacturing_events, MANUFACTURING_DELETE_DATA);
 }
 
 static void manufacturing_default_cmd(char** _arg)
 {
-	PL_UNUSED_ARG(_arg);
+	ABSL_UNUSED_ARG(_arg);
 
-	pl_event_set(&manufacturing_events, MANUFACTURING_DEFAULT_DATA);
+	absl_event_set(&manufacturing_events, MANUFACTURING_DEFAULT_DATA);
 }
 
 static void manufacturing_exit_cmd(char** _arg)
 {
-	PL_UNUSED_ARG(_arg);
+	ABSL_UNUSED_ARG(_arg);
 
-	pl_event_set(&manufacturing_events, MANUFACTURING_EXIT);
+	absl_event_set(&manufacturing_events, MANUFACTURING_EXIT);
 }
 
 void manufaturing_print_data(manufacturing_t* _data_to_print)
 {
-	pl_debug_printf("\nID number: %s\n", _data_to_print->id_mumber);
-	pl_debug_printf("mac address: 0x%02x:0x%02x:0x%02x:0x%02x:0x%02x:0x%02x\n", _data_to_print->mac_address[0],
+	absl_debug_printf("\nID number: %s\n", _data_to_print->id_mumber);
+	absl_debug_printf("mac address: 0x%02x:0x%02x:0x%02x:0x%02x:0x%02x:0x%02x\n", _data_to_print->mac_address[0],
 																				_data_to_print->mac_address[1],
 																				_data_to_print->mac_address[2],
 																				_data_to_print->mac_address[3],
 																				_data_to_print->mac_address[4],
 																				_data_to_print->mac_address[5]);
-	pl_debug_printf("Model: %s\n", _data_to_print->model);
-	pl_debug_printf("\nBoard 1 data:\n board: %s\n", _data_to_print->hw_version[0].board);
-	pl_debug_printf(" serial number: %s\n", _data_to_print->hw_version[0].serial);
-	pl_debug_printf(" Manufacturer: %s\n", _data_to_print->hw_version[0].manufacturer);
-	pl_debug_printf(" HW version: %s\n", _data_to_print->hw_version[0].hw_version);
-	pl_debug_printf("\nBoard 2 data:\n board: %s\n", _data_to_print->hw_version[1].board);
-	pl_debug_printf(" serial number: %s\n", _data_to_print->hw_version[1].serial);
-	pl_debug_printf(" Manufacturer: %s\n", _data_to_print->hw_version[1].manufacturer);
-	pl_debug_printf(" HW version: %s\n", _data_to_print->hw_version[1].hw_version);
+	absl_debug_printf("Model: %s\n", _data_to_print->model);
+	absl_debug_printf("\nBoard 1 data:\n board: %s\n", _data_to_print->hw_version[0].board);
+	absl_debug_printf(" serial number: %s\n", _data_to_print->hw_version[0].serial);
+	absl_debug_printf(" Manufacturer: %s\n", _data_to_print->hw_version[0].manufacturer);
+	absl_debug_printf(" HW version: %s\n", _data_to_print->hw_version[0].hw_version);
+	absl_debug_printf("\nBoard 2 data:\n board: %s\n", _data_to_print->hw_version[1].board);
+	absl_debug_printf(" serial number: %s\n", _data_to_print->hw_version[1].serial);
+	absl_debug_printf(" Manufacturer: %s\n", _data_to_print->hw_version[1].manufacturer);
+	absl_debug_printf(" HW version: %s\n", _data_to_print->hw_version[1].hw_version);
 }

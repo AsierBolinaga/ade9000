@@ -12,9 +12,9 @@
  ******************************************************************************/
 #include "streaming_types.h"
 
-#include "pl_socket.h"
-#include "pl_queue.h"
-#include "pl_event.h"
+#include "absl_socket.h"
+#include "absl_queue.h"
+#include "absl_event.h"
 
 /******************************************************************************
  * Defines
@@ -53,8 +53,8 @@ typedef struct tcp_stream_data
  ******************************************************************************/
 typedef struct streaming_thread_data
 {
- 	pl_socket_t				pl_socket_stream;
- 	pl_socket_config_t* 	socket_stream_config;
+ 	absl_socket_t				absl_socket_stream;
+ 	absl_socket_config_t* 	socket_stream_config;
  	uint32_t				not_send_count;
  	stream_data_config_t  	stream_config;
  	tcp_stream_data_t		data_to_send;
@@ -63,9 +63,9 @@ typedef struct streaming_thread_data
 typedef struct streaming_thread_config
 {
 	uint32_t	 				stream_socket_index;
-	pl_event_t*					stream_events;
-	pl_queue_t*					stream_data_queue;
-	pl_event_t*					service_event_group;
+	absl_event_t*					stream_events;
+	absl_queue_t*					stream_data_queue;
+	absl_event_t*					service_event_group;
 	uint32_t					connected_event;
 	uint32_t					could_not_connect_event;
 	uint32_t					queue_data_size;

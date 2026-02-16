@@ -1,0 +1,221 @@
+{
+	"format": [
+		{
+			"name": "ts",
+			"type": "u64"
+		},
+		{
+			"name": "AIRMS",
+			"type": "f32"
+		},
+		{
+			"name": "AVRMS",
+			"type": "f32"
+		},
+		{
+			"name": "BIRMS",
+			"type": "f32"
+		},
+		{
+			"name": "BVRMS",
+			"type": "f32"
+		},
+		{
+			"name": "CIRMS",
+			"type": "f32"
+		},
+		{
+			"name": "CVRMS",
+			"type": "f32"
+		},
+		{
+			"name": "APF",
+			"type": "f32"
+		},
+		{
+			"name": "BPF",
+			"type": "f32"
+		},
+		{
+			"name": "CPF",
+			"type": "f32"
+		},
+		{
+			"name": "AVTHD",
+			"type": "f32"
+		},
+		{
+			"name": "AITHD",
+			"type": "f32"
+		},
+		{
+			"name": "BVTHD",
+			"type": "f32"
+		},
+		{
+			"name": "BITHD",
+			"type": "f32"
+		},
+		{
+			"name": "CVTHD",
+			"type": "f32"
+		},
+		{
+			"name": "CITHD",
+			"type": "f32"
+		},
+		{
+			"name": "AWATTHR",
+			"type": "f64"
+		},
+		{
+			"name": "BWATTHR",
+			"type": "f64"
+		},
+		{
+			"name": "CWATTHR",
+			"type": "f64"
+		},
+		{
+			"name": "AVARHR",
+			"type": "f64"
+		},
+		{
+			"name": "BVARHR",
+			"type": "f64"
+		},
+		{
+			"name": "CVARHR",
+			"type": "f64"
+		},
+		{
+			"name": "AVAHR",
+			"type": "f64"
+		},
+		{
+			"name": "BVAHR",
+			"type": "f64"
+		},
+		{
+			"name": "CVAHR",
+			"type": "f64"
+		},
+		{
+			"name": "AFWATTHR",
+			"type": "f64"
+		},
+		{
+			"name": "BFWATTHR",
+			"type": "f64"
+		},
+		{
+			"name": "CFWATTHR",
+			"type": "f64"
+		},
+		{
+			"name": "AFVARHR",
+			"type": "f64"
+		},
+		{
+			"name": "BFVARHR",
+			"type": "f64"
+		},
+		{
+			"name": "CFVARHR",
+			"type": "f64"
+		},
+		{
+			"name": "AFVAHR",
+			"type": "f64"
+		},
+		{
+			"name": "BFVAHR",
+			"type": "f64"
+		},
+		{
+			"name": "CFVAHR",
+			"type": "f64"
+		},
+		{
+			"name": "OIA",
+			"type": "f32"
+		},
+		{
+			"name": "OIB",
+			"type": "f32"
+		},
+		{
+			"name": "OIC",
+			"type": "f32"
+		},
+		{
+			"name": "CFVANL",
+			"type": "u32"
+		},
+		{
+			"name": "CFVARNL",
+			"type": "u32"
+		},
+		{
+			"name": "CVANL",
+			"type": "u32"
+		},
+		{
+			"name": "CVARNL",
+			"type": "u32"
+		},
+		{
+			"name": "CWATTNL",
+			"type": "u32"
+		},
+		{
+			"name": "BFVANL",
+			"type": "u32"
+		},
+		{
+			"name": "BFVARNL",
+			"type": "u32"
+		},
+		{
+			"name": "BVANL",
+			"type": "u32"
+		},
+		{
+			"name": "BVARNL",
+			"type": "u32"
+		},
+		{
+			"name": "BWATTNL",
+			"type": "u32"
+		},
+		{
+			"name": "AFVANL",
+			"type": "u32"
+		},
+		{
+			"name": "AFVARNL",
+			"type": "u32"
+		},
+		{
+			"name": "AVANL",
+			"type": "u32"
+		},
+		{
+			"name": "AVARNL",
+			"type": "u32"
+		},
+		{
+			"name": "AWATTNL",
+			"type": "u32"
+		}
+	],
+	"meta": {
+		"endianess": "le",
+		"timestamp": {
+			"begin": "ts",
+			"unit": "us"
+		},
+		"version": 1
+	},
+	"types": {}
+}

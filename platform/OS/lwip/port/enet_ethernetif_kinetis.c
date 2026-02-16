@@ -184,7 +184,7 @@ struct ethernetif
 
 struct ethernetif * event_ethernetif;
 
-pl_event_t enet_time_events;
+absl_event_t enet_time_events;
 
 /*******************************************************************************
  * Prototypes
@@ -250,7 +250,7 @@ void enet_1588_settime_s_us(uint64_t _sec, uint32_t _us)
 	timestamp.nanosecond = _us*1000;
 
     ENET_Ptp1588SetTimer(event_ethernetif->base, &(event_ethernetif->handle), &timestamp);
-    pl_event_set(&enet_time_events, ETHERNETIF_TIME_UPDATED);
+    absl_event_set(&enet_time_events, ETHERNETIF_TIME_UPDATED);
 }
 
 void enet_1588_settime(enet_ptp_time_t *timestamp)
@@ -638,7 +638,7 @@ void ethernetif_plat_init(struct netif *netif,
 //
 //    ENET_Ptp1588AdjustTimer(event_ethernetif->base, corr_inc, corr_period);
 
-    pl_event_create(&enet_time_events);
+    absl_event_create(&enet_time_events);
 }
 
 void **ethernetif_base_ptr(struct ethernetif *ethernetif)

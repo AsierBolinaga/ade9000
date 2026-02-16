@@ -1,0 +1,4 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_ntp_freertos.c:83:13:absl_ntp_sync_stop_freertos	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_ntp_freertos.c:77:13:absl_ntp_sync_start_freertos	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_ntp_freertos.c:21:13:absl_ntp_init_freertos	16	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_ntp_freertos.c:48:13:absl_ntp_sync_time_freertos	16	static

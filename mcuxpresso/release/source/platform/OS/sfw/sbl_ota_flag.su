@@ -1,0 +1,7 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/OS/sfw/sbl_ota_flag.c:24:6:write_update_type	16	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/OS/sfw/sbl_ota_flag.c:50:9:read_ota_status	40	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/OS/sfw/sbl_ota_flag.c:71:6:enable_image	8	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/OS/sfw/sbl_ota_flag.c:94:6:write_image_ok	16	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/OS/sfw/sbl_ota_flag.c:126:6:SBL_EnableRemap	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/OS/sfw/sbl_ota_flag.c:141:6:SBL_DisableRemap	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/OS/sfw/sbl_ota_flag.c:274:8:compare_image_version	0	static

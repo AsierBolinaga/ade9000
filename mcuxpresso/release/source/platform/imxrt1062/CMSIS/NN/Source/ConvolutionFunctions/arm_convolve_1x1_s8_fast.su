@@ -1,0 +1,2 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/CMSIS/NN/Source/ConvolutionFunctions/arm_convolve_1x1_s8_fast.c:53:12:arm_convolve_1x1_s8_fast	56	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/CMSIS/NN/Source/ConvolutionFunctions/arm_convolve_1x1_s8_fast.c:173:9:arm_convolve_1x1_s8_fast_get_buffer_size	0	static

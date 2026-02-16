@@ -1,0 +1,93 @@
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
+ASM_SRCS := 
+C_SRCS := 
+OBJ_SRCS := 
+O_SRCS := 
+S_SRCS := 
+S_UPPER_SRCS := 
+C_DEPS := 
+EXECUTABLES := 
+OBJS := 
+
+# Every subdirectory with source files must be described here
+SUBDIRS := \
+source/abstraction_layer \
+source/board \
+source/cJSON \
+source/components \
+source/data_extractor/cmd \
+source/data_extractor/debug \
+source/data_extractor/energy \
+source/data_extractor/event_handler \
+source/data_extractor/fw_update \
+source/data_extractor/fw_update/sfw \
+source/data_extractor/led_handler \
+source/data_extractor/manufacturing \
+source/data_extractor/protocol/json \
+source/data_extractor/protocol/mqtt \
+source/data_extractor/sensors/ade9000 \
+source/data_extractor/streaming \
+source/data_extractor \
+source/data_extractor/timesync \
+source/data_extractor/vars_read \
+source/data_extractor/watchdog \
+source \
+source/platform/OS/freertos/freertos-kernel \
+source/platform/OS/freertos/freertos-kernel/portable/GCC/ARM_CM4F \
+source/platform/OS/freertos/freertos-kernel/portable/MemMang \
+source/platform/OS/lwip/contrib/apps/ping \
+source/platform/OS/lwip/port \
+source/platform/OS/lwip/src/api \
+source/platform/OS/lwip/src/apps/mdns \
+source/platform/OS/lwip/src/apps/mqtt \
+source/platform/OS/lwip/src/apps/sntp \
+source/platform/OS/lwip/src/core \
+source/platform/OS/lwip/src/core/ipv4 \
+source/platform/OS/lwip/src/core/ipv6 \
+source/platform/OS/lwip/src/netif \
+source/platform/OS/lwip/src/netif/ppp \
+source/platform/OS/lwip/src/netif/ppp/polarssl \
+source/platform/OS/sfw \
+source/platform/imxrt1062/CMSIS/DSP/Source/BasicMathFunctions \
+source/platform/imxrt1062/CMSIS/DSP/Source/BayesFunctions \
+source/platform/imxrt1062/CMSIS/DSP/Source/CommonTables \
+source/platform/imxrt1062/CMSIS/DSP/Source/ComplexMathFunctions \
+source/platform/imxrt1062/CMSIS/DSP/Source/ControllerFunctions \
+source/platform/imxrt1062/CMSIS/DSP/Source/DistanceFunctions \
+source/platform/imxrt1062/CMSIS/DSP/Source/FastMathFunctions \
+source/platform/imxrt1062/CMSIS/DSP/Source/FilteringFunctions \
+source/platform/imxrt1062/CMSIS/DSP/Source/InterpolationFunctions \
+source/platform/imxrt1062/CMSIS/DSP/Source/MatrixFunctions \
+source/platform/imxrt1062/CMSIS/DSP/Source/QuaternionMathFunctions \
+source/platform/imxrt1062/CMSIS/DSP/Source/SVMFunctions \
+source/platform/imxrt1062/CMSIS/DSP/Source/StatisticsFunctions \
+source/platform/imxrt1062/CMSIS/DSP/Source/SupportFunctions \
+source/platform/imxrt1062/CMSIS/DSP/Source/TransformFunctions \
+source/platform/imxrt1062/CMSIS/NN/Source/ActivationFunctions \
+source/platform/imxrt1062/CMSIS/NN/Source/BasicMathFunctions \
+source/platform/imxrt1062/CMSIS/NN/Source/ConcatenationFunctions \
+source/platform/imxrt1062/CMSIS/NN/Source/ConvolutionFunctions \
+source/platform/imxrt1062/CMSIS/NN/Source/FullyConnectedFunctions \
+source/platform/imxrt1062/CMSIS/NN/Source/NNSupportFunctions \
+source/platform/imxrt1062/CMSIS/NN/Source/PoolingFunctions \
+source/platform/imxrt1062/CMSIS/NN/Source/ReshapeFunctions \
+source/platform/imxrt1062/CMSIS/NN/Source/SVDFunctions \
+source/platform/imxrt1062/CMSIS/NN/Source/SoftmaxFunctions \
+source/platform/imxrt1062/component/flashiap \
+source/platform/imxrt1062/component/lists \
+source/platform/imxrt1062/component/phy \
+source/platform/imxrt1062/component/serial_manager \
+source/platform/imxrt1062/component/silicon_id \
+source/platform/imxrt1062/component/uart \
+source/platform/imxrt1062/device \
+source/platform/imxrt1062/drivers/freertos \
+source/platform/imxrt1062/drivers \
+source/platform/imxrt1062/flash/mflash \
+source/platform/imxrt1062/startup \
+source/platform/imxrt1062/utilities \
+source/platform/imxrt1062/xip \
+source/sbl/scripts \
+

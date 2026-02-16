@@ -1,0 +1,4 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/fw_update/fw_update.c:299:13:fw_update_check_and_erase_new_fw_area	48	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/fw_update/fw_update.c:165:13:fw_update_active_state	544	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/fw_update/fw_update.c:63:6:fw_update_task_initialize	16	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/fw_update/fw_update.c:107:6:fw_update_task	48	static

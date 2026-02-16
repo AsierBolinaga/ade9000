@@ -1,0 +1,5 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_queue_freertos.c:11:15:absl_queue_create_freertos	8	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_queue_freertos.c:24:15:absl_queue_send_freertos	8	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_queue_freertos.c:46:15:absl_queue_send_fromISR_freertos	16	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_queue_freertos.c:64:15:absl_queue_receive_freertos	8	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_queue_freertos.c:86:15:absl_queue_receive_freertos_fromISR	16	static

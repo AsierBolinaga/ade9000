@@ -12,8 +12,8 @@
  ******************************************************************************/
 #include "sensors_types.h"
 
-#include "pl_event.h"
-#include "pl_queue.h"
+#include "absl_event.h"
+#include "absl_queue.h"
 
 /******************************************************************************
  * Definitions
@@ -37,12 +37,12 @@ typedef enum var_read_events
 
 typedef struct vars_read_thread_config
 {
-	pl_event_t*			 		vars_events;
-	pl_event_t*					stream_event;
+	absl_event_t*			 		vars_events;
+	absl_event_t*					stream_event;
 	uint32_t					data_to_send_flag;
-	pl_event_t*					energy_event;
+	absl_event_t*					energy_event;
 	uint32_t					vars_configured_flag;
-	pl_queue_t*			 		read_data_send_queue;
+	absl_queue_t*			 		read_data_send_queue;
 	float*			 			queue_send_wait_ms;
 	bool 						(*vars_read_cb)(void* _vars_config, void* _vars_value);
 	bool 						(*vars_config_cb)(void);

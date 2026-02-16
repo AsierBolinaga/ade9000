@@ -1,0 +1,5 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/OS/lwip/src/core/mem.c:544:1:mem_init	8	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/OS/lwip/src/core/mem.c:645:1:mem_free	24	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/OS/lwip/src/core/mem.c:727:1:mem_trim	32	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/OS/lwip/src/core/mem.c:859:1:mem_malloc	40	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/OS/lwip/src/core/mem.c:1027:1:mem_calloc	16	static

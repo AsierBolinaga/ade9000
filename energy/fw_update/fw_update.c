@@ -11,12 +11,12 @@
 
 #include "interfaces.h"
 
-#include "pl_system.h"
-#include "pl_nvm.h"
-#include "pl_thread.h"
-#include "pl_system.h"
-#include "pl_debug.h"
-#include "pl_hw_config.h"
+#include "absl_system.h"
+#include "absl_nvm.h"
+#include "absl_thread.h"
+#include "absl_system.h"
+#include "absl_debug.h"
+#include "absl_hw_config.h"
 
 /*******************************************************************************
  * Definitions
@@ -29,7 +29,7 @@ static fw_update_task_states_t 	fw_update_state;
 
 static fw_update_thread_config_t* fw_update_config;
 
-static pl_nvm_t		fw_update_nvm;
+static absl_nvm_t		fw_update_nvm;
 
 static uint32_t actual_fw_slot_index;
 static uint32_t slot_to_update_index;
@@ -62,22 +62,22 @@ bool fw_update_task_initialize(fw_update_thread_config_t* _fw_update_task_config
 {
 	bool return_value = false;
 
-	pl_nvm_config_t*	fw_update_nvm_config;
+	absl_nvm_config_t*	fw_update_nvm_config;
 
 	if(NULL != _fw_update_task_config)
 	{
 		fw_update_config = _fw_update_task_config;
-		fw_update_nvm_config = pl_config_get_nvm_conf(fw_update_config->nvm_conf_index);
+		fw_update_nvm_config = absl_config_get_nvm_conf(fw_update_config->nvm_conf_index);
 
-		if((PL_EVENT_RV_OK == pl_event_create(fw_update_config->fw_update_event_group)) &&
-		   (PL_NVM_RV_OK == pl_nvm_init(&fw_update_nvm, fw_update_nvm_config)))
+		if((ABSL_EVENT_RV_OK == absl_event_create(fw_update_config->fw_update_event_group)) &&
+		   (ABSL_NVM_RV_OK == absl_nvm_init(&fw_update_nvm, fw_update_nvm_config)))
         {
 			if(true == fw_update_check_image(&fw_update_nvm, &fw_update_config->fw_update_handling_conf,
 					   fw_update_config->fw_update_done_flag, fw_update_config->fw_update_started_flag))
 			{
 				actual_fw_slot_index = fw_update_get_fw_slot();
 				slot_to_update_index = fw_update_get_update_slot();
-				partition_size =  pl_nvm_get_size(&fw_update_nvm, actual_fw_slot_index);
+				partition_size =  absl_nvm_get_size(&fw_update_nvm, actual_fw_slot_index);
 
 				fw_update_reset_update_vars();
 				area_is_empty = fw_update_check_and_erase_new_fw_area();
@@ -106,13 +106,13 @@ void fw_update_task(void *arg)
 
 	if(!fw_update_config->fw_update_initialized)
 	{
-		pl_debug_printf("ERROR! fw update thread has not been initialized!\n");
-		pl_hardfault_handler(THREAD_NOT_INIT_ERROR);
+		absl_debug_printf("ERROR! fw update thread has not been initialized!\n");
+		absl_hardfault_handler(THREAD_NOT_INIT_ERROR);
 	}
 
 	while(1)
 	{
-        if(PL_EVENT_RV_OK == pl_event_wait(fw_update_config->fw_update_event_group, FW_UPDATE_EVENTS, &recieved_events))
+        if(ABSL_EVENT_RV_OK == absl_event_wait(fw_update_config->fw_update_event_group, FW_UPDATE_EVENTS, &recieved_events))
 		{
             fw_update_state = fw_update_config->sensor_to_task_state[*system_state];
             switch(fw_update_state)
@@ -126,13 +126,13 @@ void fw_update_task(void *arg)
             break;
 
             default:
-                pl_hardfault_handler(UNKNOWN_SWITCH_CASE_ERROR);
+                absl_hardfault_handler(UNKNOWN_SWITCH_CASE_ERROR);
             break;
             }
         }
         else
         {
-            pl_hardfault_handler(UNKNOWN_EVENT_ERROR);
+            absl_hardfault_handler(UNKNOWN_EVENT_ERROR);
         }
 	}
 }
@@ -145,8 +145,8 @@ static void fw_update_idle_state(uint32_t _events)
 		area_is_empty = fw_update_check_and_erase_new_fw_area();
 		if(true == area_is_empty)
 		{
-			pl_event_set(fw_update_config->system_event_group, fw_update_config->erase_done_event);
-			pl_event_clear_all(fw_update_config->fw_update_event_group);
+			absl_event_set(fw_update_config->system_event_group, fw_update_config->erase_done_event);
+			absl_event_clear_all(fw_update_config->fw_update_event_group);
 		}
 	}
 }
@@ -163,7 +163,7 @@ static void fw_update_active_state(uint32_t _events)
 		{
 			if(false == update_error_detected)
 			{			
-				pl_nvm_rv_t nvm_write_rv;
+				absl_nvm_rv_t nvm_write_rv;
 
 				length = fw_update_data_get(data);
 				
@@ -175,16 +175,16 @@ static void fw_update_active_state(uint32_t _events)
 					}
 				}
 
-				nvm_write_rv = pl_nvm_write(&fw_update_nvm, slot_to_update_index, chunk_offset, length, (void*)&data);
-				if(PL_NVM_RV_ERROR == nvm_write_rv)
+				nvm_write_rv = absl_nvm_write(&fw_update_nvm, slot_to_update_index, chunk_offset, length, (void*)&data);
+				if(ABSL_NVM_RV_ERROR == nvm_write_rv)
 				{
-					pl_debug_printf("\rFlash writing operation failed\n");
+					absl_debug_printf("\rFlash writing operation failed\n");
 					update_error_detected = true;
 					fw_update_notify_system_event(fw_update_config->event_info_array, FWU_EVENTS_WRITE_FAILED);
 				}
-				else if(PL_NVM_RV_AREA_NOT_EMPTY == nvm_write_rv)
+				else if(ABSL_NVM_RV_AREA_NOT_EMPTY == nvm_write_rv)
 				{
-					pl_debug_printf("\rFlash writing area not empty\n");
+					absl_debug_printf("\rFlash writing area not empty\n");
 					update_error_detected = true;
 					fw_update_notify_system_event(fw_update_config->event_info_array, FWU_EVENTS_UPDATE_AREA_NOT_EMPTY);
 				}
@@ -193,7 +193,7 @@ static void fw_update_active_state(uint32_t _events)
 				if (chunk_offset >= partition_size)
 				{
 					/* Partition boundary exceeded */
-					pl_debug_printf("\rstore_update_image: partition boundary exceeded\n");
+					absl_debug_printf("\rstore_update_image: partition boundary exceeded\n");
 					update_error_detected = true;
 					fw_update_notify_system_event(fw_update_config->event_info_array, FWU_EVENTS_AREA_EXCEEDED);
 				}
@@ -204,31 +204,31 @@ static void fw_update_active_state(uint32_t _events)
 		{
 			if(false == update_error_detected)
 			{
-				pl_debug_printf("\nstore_update_image: processed %i bytes\r\n", chunk_offset);
+				absl_debug_printf("\nstore_update_image: processed %i bytes\r\n", chunk_offset);
 
 				if( true == fw_update_validate_written_image(chunk_offset))
 				{
-					pl_system_set_fwu_flag(fw_update_config->fw_update_done_flag);
-					pl_thread_sleep(5000);
-					pl_system_reboot();
+					absl_system_set_fwu_flag(fw_update_config->fw_update_done_flag);
+					absl_thread_sleep(5000);
+					absl_system_reboot();
 				}
 				else
 				{
 					fw_update_reset_update_vars();
-					pl_event_set(fw_update_config->system_event_group, fw_update_config->erase_needed);
+					absl_event_set(fw_update_config->system_event_group, fw_update_config->erase_needed);
 				}
 			}
 			else
 			{
 				fw_update_reset_update_vars();
-				pl_event_set(fw_update_config->system_event_group, fw_update_config->erase_needed);
+				absl_event_set(fw_update_config->system_event_group, fw_update_config->erase_needed);
 			}
 		}
 	}
 	else
 	{
 		fw_update_notify_system_event(fw_update_config->event_info_array, FWU_EVENTS_UPDATE_AREA_NOT_EMPTY);
-		pl_event_set(fw_update_config->system_event_group, fw_update_config->erase_needed);
+		absl_event_set(fw_update_config->system_event_group, fw_update_config->erase_needed);
 	}
 
 	if(FW_UPDATE_RESET_FW_UPDATE == (_events & FW_UPDATE_RESET_FW_UPDATE))
@@ -237,17 +237,17 @@ static void fw_update_active_state(uint32_t _events)
 		area_is_empty = fw_update_check_and_erase_new_fw_area();
 		if(true == area_is_empty)
 		{
-			pl_event_set(fw_update_config->system_event_group, fw_update_config->erase_done_event);
-			pl_event_clear_all(fw_update_config->fw_update_event_group);
+			absl_event_set(fw_update_config->system_event_group, fw_update_config->erase_done_event);
+			absl_event_clear_all(fw_update_config->fw_update_event_group);
 		}
 	}
 }
 
 static void fw_update_erase_new_fw_area(void)
 {
-	if(PL_NVM_RV_ERROR == pl_nvm_erase(&fw_update_nvm, slot_to_update_index, erase_offset, fw_update_config->erase_chunks))
+	if(ABSL_NVM_RV_ERROR == absl_nvm_erase(&fw_update_nvm, slot_to_update_index, erase_offset, fw_update_config->erase_chunks))
 	{
-		pl_debug_printf("Error erasing flash area\n");
+		absl_debug_printf("Error erasing flash area\n");
 		update_error_detected = true;
 		fw_update_notify_system_event(fw_update_config->event_info_array, FWU_EVENTS_ERASE_FAILED);
 	}
@@ -275,8 +275,8 @@ static bool fw_update_check_new_fw_area(void)
 
 	for(uint32_t area_offset = 0; area_offset < partition_size; area_offset+=4)
 	{
-		pl_nvm_read(&fw_update_nvm, slot_to_update_index, area_offset, 4, (void*)&read_data);
-		if(read_data != PL_NMV_EMPTY_ADRESS)
+		absl_nvm_read(&fw_update_nvm, slot_to_update_index, area_offset, 4, (void*)&read_data);
+		if(read_data != ABSL_NMV_EMPTY_ADRESS)
 		{
 			return true;
 		}
@@ -292,12 +292,12 @@ static bool fw_update_check_and_erase_new_fw_area(void)
 
 	if(data_found)
 	{
-		pl_debug_printf("Data found in new fw sector. Erasing sector.\n");
+		absl_debug_printf("Data found in new fw sector. Erasing sector.\n");
 		while((false == erase_done) && (false == update_error_detected))
 		{
 			fw_update_erase_new_fw_area();
 		}
-		pl_debug_printf("Erase done.\n");
+		absl_debug_printf("Erase done.\n");
 
 		if(false == update_error_detected)
 		{

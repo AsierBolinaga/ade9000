@@ -1,0 +1,7 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/flash/mflash/mflash_drv.c:190:10:flexspi_nor_enable_quad_mode	56	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/flash/mflash/mflash_drv.c:359:9:mflash_drv_init	8	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/flash/mflash/mflash_drv.c:395:9:mflash_drv_sector_erase	64	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/flash/mflash/mflash_drv.c:434:9:mflash_drv_page_program	64	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/flash/mflash/mflash_drv.c:468:9:mflash_drv_read	32	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/flash/mflash/mflash_drv.c:479:7:mflash_drv_phys2log	8	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/flash/mflash/mflash_drv.c:514:10:mflash_drv_log2phys	8	static

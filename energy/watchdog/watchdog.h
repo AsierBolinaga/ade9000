@@ -8,7 +8,7 @@
 #ifndef WATCHDOG_H_
 #define WATCHDOG_H_
 
-#include "pl_types.h"
+#include "absl_types.h"
 
 typedef struct watchdog_config_t
 {

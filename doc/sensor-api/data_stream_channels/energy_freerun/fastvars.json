@@ -1,0 +1,88 @@
+{
+	"format": [
+		{
+			"name": "ts_start",
+			"type": "u64"
+		},
+		{
+			"name": "ts_end",
+			"type": "u64"
+		},
+		{
+			"name": "IA[A]",
+			"type": "energy_channel"
+		},
+		{
+			"name": "IB[A]",
+			"type": "energy_channel"
+		},
+		{
+			"name": "IC[A]",
+			"type": "energy_channel"
+		},
+		{
+			"name": "VA[V]",
+			"type": "energy_channel"
+		},
+		{
+			"name": "VB[V]",
+			"type": "energy_channel"
+		},
+		{
+			"name": "VC[V]",
+			"type": "energy_channel"
+		},
+		{
+			"name": "SA[VA]",
+			"type": "energy_channel"
+		},
+		{
+			"name": "SB[VA]",
+			"type": "energy_channel"
+		},
+		{
+			"name": "SC[VA]",
+			"type": "energy_channel"
+		},
+		{
+			"name": "PA[W]",
+			"type": "energy_channel"
+		},
+		{
+			"name": "PB[W]",
+			"type": "energy_channel"
+		},
+		{
+			"name": "PC[W]",
+			"type": "energy_channel"
+		},
+		{
+			"name": "QA[VAR]",
+			"type": "energy_channel"
+		},
+		{
+			"name": "QB[VAR]",
+			"type": "energy_channel"
+		},
+		{
+			"name": "QC[VAR]",
+			"type": "energy_channel"
+		}
+	],
+	"meta": {
+		"endianess": "le",
+		"timestamp": {
+			"begin": "ts_start",
+			"end": "ts_end",
+			"unit": "us"
+		},
+		"version": 1
+	},
+	"types": {
+		"energy_channel": {
+			"count": 128,
+			"items": "f32",
+			"kind": "array"
+		}
+	}
+}

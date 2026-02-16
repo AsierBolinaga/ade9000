@@ -31,16 +31,16 @@
 #include "mqtt_protocol.h"
 #include "json.h"
 
-#include "pl_system.h"
-#include "pl_debug.h"
-#include "pl_thread.h"
-#include "pl_hw_config.h"
-#include "pl_macros.h"
-#include "pl_nvm.h"
-#include "pl_gpio.h"
-#include "pl_system.h"
+#include "absl_system.h"
+#include "absl_debug.h"
+#include "absl_thread.h"
+#include "absl_hw_config.h"
+#include "absl_macros.h"
+#include "absl_nvm.h"
+#include "absl_gpio.h"
+#include "absl_system.h"
 
-#include "pl_hw_config.h"
+#include "absl_hw_config.h"
 
 /*******************************************************************************
  * Definitions
@@ -166,24 +166,24 @@ static uint8_t 	enet_phy;
 static bool	system_connected_eth;
 static bool	system_connected_to_server;
 
-static pl_queue_t events_info_queue;
-static pl_queue_t send_states_queue;
-static pl_queue_t send_alets_queue;
-static pl_queue_t fast_vars_stream_data_queue;
-static pl_queue_t slow_vars_stream_data_queue;
+static absl_queue_t events_info_queue;
+static absl_queue_t send_states_queue;
+static absl_queue_t send_alets_queue;
+static absl_queue_t fast_vars_stream_data_queue;
+static absl_queue_t slow_vars_stream_data_queue;
 
-static pl_event_t system_events;
-static pl_event_t energy_events;
-static pl_event_t fast_vars_read_events;
-static pl_event_t slow_vars_read_events;
-static pl_event_t fast_vars_stream_events;
-static pl_event_t slow_vars_stream_events;
-static pl_event_t cmd_events;
-static pl_event_t fw_update_events;
-static pl_event_t timesync_events;
+static absl_event_t system_events;
+static absl_event_t energy_events;
+static absl_event_t fast_vars_read_events;
+static absl_event_t slow_vars_read_events;
+static absl_event_t fast_vars_stream_events;
+static absl_event_t slow_vars_stream_events;
+static absl_event_t cmd_events;
+static absl_event_t fw_update_events;
+static absl_event_t timesync_events;
 
-static pl_nvm_config_t*			nvm_config;
-static pl_nvm_t					qspi_nvm;
+static absl_nvm_config_t*			nvm_config;
+static absl_nvm_t					qspi_nvm;
 
 static uint32_t	 state_events;
 
@@ -435,12 +435,12 @@ static energy_task_states_t sensor_to_energy_state[SYSTEM_STATE_MAXVALUE] =
 
 static energy_sensor_init_conf_t energy_sensor_config =
 {
-	PL_SPI_ENERGY,
-	PL_IRQ0_ENET_EVENT,
-	PL_GPIO_ADE9000_RESET,
+	ABSL_SPI_ENERGY,
+	ABSL_IRQ0_ENET_EVENT,
+	ABSL_GPIO_ADE9000_RESET,
 	&fast_vars_data.waveform_samples,
 #ifdef DEBUG_PIN
-	PL_GPIO_DEBUG,
+	ABSL_GPIO_DEBUG,
 #endif
 	(void*)ade9000_event_info
 };
@@ -473,7 +473,7 @@ static energy_thread_config_t energy_config =
 	false								/* energy_initialized */
 };
 
-static  pl_thread_t energy_thread;
+static  absl_thread_t energy_thread;
 
 /***************************************************************************
  * VARS READ configuration fast variables instance
@@ -507,7 +507,7 @@ static vars_read_thread_t fast_vars_read =
 	&fast_vars_read_thread_config
 };
 
-static  pl_thread_t fast_vars_read_thread;
+static  absl_thread_t fast_vars_read_thread;
 
 /***************************************************************************
  * VARS READ configuration slow variables instance
@@ -540,7 +540,7 @@ static vars_read_thread_t slow_vars_read =
 	&slow_vars_read_thread_config
 };
 
-static  pl_thread_t slow_vars_read_thread;
+static  absl_thread_t slow_vars_read_thread;
 
 /***************************************************************************
  * STREAMING TASK configuration fast variables instance
@@ -552,7 +552,7 @@ static waveform_data_t 		fast_vars_stream_data;
 
 static  streaming_thread_config_t fast_streaming_config =
 {
-	PL_SOCKET_STREAM_FAST, 				/* stream_socket_index */
+	ABSL_SOCKET_STREAM_FAST, 				/* stream_socket_index */
 	&fast_vars_stream_events,			/* stream_events */
 	&fast_vars_stream_data_queue,   	/* stream_data_queue */
 	&energy_events,						/* service_event_group */
@@ -563,7 +563,7 @@ static  streaming_thread_config_t fast_streaming_config =
 	system_get_fast_vars_stream_config, /* stream_config_cb */
 	(void*)&fast_vars_stream_data,		/* stream_data */
 #ifdef DEBUG_PIN
-	PL_GPIO_DEBUG,
+	ABSL_GPIO_DEBUG,
 #endif
 	st_fast_event_info,					/* event_info_array */
 	false								/* stream_initialized */
@@ -577,7 +577,7 @@ static streaming_thread_t fast_stream =
 	&fast_streaming_config
 };
 
-static  pl_thread_t fast_stream_thread;
+static  absl_thread_t fast_stream_thread;
 
 /***************************************************************************
  * STREAMING TASK configuration slow variables instance
@@ -589,7 +589,7 @@ static slow_vars_data_t slow_vars_stream_data;
 
 static  streaming_thread_config_t slow_streaming_config =
 {
-	PL_SOCKET_STREAM_SLOW, 				/* stream_socket_index */
+	ABSL_SOCKET_STREAM_SLOW, 				/* stream_socket_index */
 	&slow_vars_stream_events,			/* stream_events */
 	&slow_vars_stream_data_queue,   	/* stream_data_queue */
 	&energy_events,						/* service_event_group */
@@ -600,7 +600,7 @@ static  streaming_thread_config_t slow_streaming_config =
 	system_get_slow_vars_stream_config, /* stream_config_cb */
 	(void*)&slow_vars_stream_data,		/* stream_data */
 #ifdef DEBUG_PIN
-	PL_GPIO_DEBUG,
+	ABSL_GPIO_DEBUG,
 #endif
 	st_slow_event_info,					/* event_info_array */
 	false	
@@ -614,7 +614,7 @@ static streaming_thread_t slow_stream =
 	&slow_streaming_config
 };
 
-static  pl_thread_t slow_stream_thread;
+static  absl_thread_t slow_stream_thread;
 
 /***************************************************************************
  * CMD TASK configuration
@@ -659,7 +659,7 @@ static sensor_config_t energy_sensors[SENSOR_MAXVALUE] =
 
 static protocol_config_t protocol_config =
 {
-	PL_MQTT_COMMANDS,
+	ABSL_MQTT_COMMANDS,
 	SENSOR_MAXVALUE,
 	energy_sensors,
 	ENERGY_FW_VERSION,
@@ -680,7 +680,7 @@ static cmd_task_states_t sensor_to_cmd_task_state[SYSTEM_STATE_MAXVALUE] =
 	CMD_TASK_STATE_FW_UPDATE		/* SYSTEM_FW_UPDATE_STATE */
 };	
 
-static pl_event_t* sensors_events[SENSOR_MAXVALUE] = {&energy_events};
+static absl_event_t* sensors_events[SENSOR_MAXVALUE] = {&energy_events};
 
 static uint32_t sensors_config_events[SENSOR_MAXVALUE] 	      = {ENERGY_CONFIGURATION};
 static uint32_t sensors_config_reset_events[SENSOR_MAXVALUE]  = {ENERGY_CONFIG_RESET};
@@ -718,7 +718,7 @@ static cmd_thread_config_t cmd_config =
 	false													/* cmd_initialized */
 };
 
-static  pl_thread_t cmd_thread;
+static  absl_thread_t cmd_thread;
 
 /***************************************************************************
  * FW UPDATE TASK configuration
@@ -737,7 +737,7 @@ static fw_update_task_states_t sensor_to_fw_update_task_state[SYSTEM_STATE_MAXVA
 
 static fw_update_thread_config_t fw_update_config =
 {
-	PL_NVM_CONFIG,
+	ABSL_NVM_CONFIG,
 	{NVM_SECTION_PRIMARY, NVM_SECTION_SECONDARY, (void*)sfw_event_info},
 	&fw_update_events,
 	sensor_to_fw_update_task_state,
@@ -751,7 +751,7 @@ static fw_update_thread_config_t fw_update_config =
 	false
 };
 
-static pl_thread_t fw_update_thread;
+static absl_thread_t fw_update_thread;
 
 /***************************************************************************
  * TIME SYNC TASK configuration
@@ -759,7 +759,7 @@ static pl_thread_t fw_update_thread;
 
 static time_sync_thread_config_t timesync_config =
 {
-	PL_NTP_SYNC,
+	ABSL_NTP_SYNC,
 	&timesync_events,
 	&system_events,
 	SYSTEM_TIME_SYNC_FINISHED,
@@ -767,7 +767,7 @@ static time_sync_thread_config_t timesync_config =
 	false
 };
 
-static pl_thread_t timesync_thread;
+static absl_thread_t timesync_thread;
 
 /***************************************************************************
  * LED TASK configuration
@@ -808,8 +808,8 @@ static led_pattern_t state_pattern_table[SYSTEM_STATE_MAXVALUE] =
 
 static led_thread_config_t led_config =
 {
-	PL_GPIO_LED_USER,
-	PL_GPIO_LED_USER_ENABLE,
+	ABSL_GPIO_LED_USER,
+	ABSL_GPIO_LED_USER_ENABLE,
 	&system_state,
 	state_pattern_table,
 	false
@@ -823,9 +823,9 @@ static led_thread_t status_led_thread =
 	&led_config
 };
 
-static  pl_thread_t slow_stream_thread;
+static  absl_thread_t slow_stream_thread;
 
-static  pl_thread_t pl_status_led_thread;
+static  absl_thread_t absl_status_led_thread;
 
 /***************************************************************************
  * WDOG configuration
@@ -833,7 +833,7 @@ static  pl_thread_t pl_status_led_thread;
 
 static watchdog_config_t wdog_config =
 {
-	PL_WDOG1,
+	ABSL_WDOG1,
 	false
 };
 
@@ -882,7 +882,7 @@ static protocol_t system_get_stream_data_protocol(transmission_config_t* _tx_con
  */
 void system_handler(void *arg)
 {
-	PL_UNUSED_ARG(arg);
+	ABSL_UNUSED_ARG(arg);
 
     system_state = SYSTEM_INIT_STATE;
 	system_connected_eth = false;
@@ -917,7 +917,7 @@ void system_handler(void *arg)
 			break;
 
 			default:
-				pl_hardfault_handler(UNKNOWN_SWITCH_CASE_ERROR);
+				absl_hardfault_handler(UNKNOWN_SWITCH_CASE_ERROR);
 			break;
 		} 
 	} 
@@ -1456,9 +1456,9 @@ sync_type_t system_sync_get_sync_type(void)
 	return sync_type;
 }
 
-pl_time_t system_sync_get_sync_period(void)
+absl_time_t system_sync_get_sync_period(void)
 {
-	pl_time_t period;
+	absl_time_t period;
 
 	char* sync_interval =  mqtt_protocol_get_sync_interval();
 
@@ -1487,8 +1487,8 @@ static void system_init_state(void)
 			uint32_t  events;
 
 			/* First time connected execute and wait first time sync */
-			pl_event_set(&timesync_events, TIMESYNC_DO_SYNC);
-			if(PL_EVENT_RV_OK != pl_event_timed_wait(&system_events, SYSTEM_TIME_SYNC_FINISHED, &events, SYSTEM_INIT_TIME_SYNC_MS))
+			absl_event_set(&timesync_events, TIMESYNC_DO_SYNC);
+			if(ABSL_EVENT_RV_OK != absl_event_timed_wait(&system_events, SYSTEM_TIME_SYNC_FINISHED, &events, SYSTEM_INIT_TIME_SYNC_MS))
 			{
 				system_handler_process_event(sh_event_info[SH_EVENTS_TIME_SYNC_PROCESS_ERROR], NULL);
 			}
@@ -1516,7 +1516,7 @@ static void system_wait_link_state(void)
 
 static void system_wait_server_state(void)
 {
-	pl_event_set(&cmd_events, CMD_CONNECT);
+	absl_event_set(&cmd_events, CMD_CONNECT);
 
 	system_handler_events_handling();
 }
@@ -1546,7 +1546,7 @@ static void system_handler_events_handling(void)
 {
 	uint32_t 	events;
 
-	pl_event_wait(&system_events, state_events, &events);
+	absl_event_wait(&system_events, state_events, &events);
 
 	if(SYSTEM_CONNECTED_TO_SERVER == (events & SYSTEM_CONNECTED_TO_SERVER))
 	{
@@ -1564,7 +1564,7 @@ static void system_handler_events_handling(void)
 				system_handler_change_state(SYSTEM_NORMAL_STATE, SYSTEM_NORMAL_STATE_EVENTS, SYSTEM_NORMAL_STATE_MSG);
 			break;
 			case SYSTEM_FW_UPDATE_STATE:
-				pl_system_get_fwu_clear_flag();
+				absl_system_get_fwu_clear_flag();
 				system_handler_change_state(SYSTEM_NORMAL_STATE, SYSTEM_NORMAL_STATE_EVENTS, SYSTEM_NORMAL_STATE_MSG);
 			break;
 			case SYSTEM_ERROR_STATE:
@@ -1575,7 +1575,7 @@ static void system_handler_events_handling(void)
 			break;
 		}
 
-		pl_event_set(&cmd_events, event_to_cmd);
+		absl_event_set(&cmd_events, event_to_cmd);
 		system_handler_send_no_conn_events();
 	}
 	if(SYSTEM_LINK_LOST == (events & SYSTEM_LINK_LOST))
@@ -1588,11 +1588,11 @@ static void system_handler_events_handling(void)
 
 		if(SYSTEM_FW_UPDATE_STATE == system_state_before_disconnection)
 		{
-			pl_system_get_fwu_clear_flag();
+			absl_system_get_fwu_clear_flag();
 			system_handler_process_event(sh_event_info[SH_EVENTS_FW_UPDATE_DISCONNECTION], NULL);
-			pl_event_set(&fw_update_events, FW_UPDATE_RESET_FW_UPDATE);
+			absl_event_set(&fw_update_events, FW_UPDATE_RESET_FW_UPDATE);
 
-			if(PL_EVENT_RV_OK != pl_event_timed_wait(&system_events, SYSTEM_FW_AREA_ERASED, &events, SYSTEM_AREA_DELETE_WAIT_MS))
+			if(ABSL_EVENT_RV_OK != absl_event_timed_wait(&system_events, SYSTEM_FW_AREA_ERASED, &events, SYSTEM_AREA_DELETE_WAIT_MS))
 			{
 				system_handler_process_event(sh_event_info[SH_EVENTS_FLASH_AREA_DELETE_ERROR], NULL);
 			}
@@ -1601,33 +1601,33 @@ static void system_handler_events_handling(void)
 	if (SYSTEM_NO_SERVER == (events & SYSTEM_NO_SERVER))
 	{
 		/* No server found with the actual IP, reassign IP in case there is a new server */
-		pl_phy_assign_ip(enet_phy);
+		absl_phy_assign_ip(enet_phy);
 		system_handler_change_state(SYSTEM_WAIT_SERVER_STATE, SYSTEM_WAIT_SERVER_STATE_EVENTS, SYSTEM_WAIT_SERVER_STATE_MSG);
 	}
 	if(SYSTEM_CONFIGURED == (events & SYSTEM_CONFIGURED))
 	{
 		system_handler_state_change_info_send(SENSOR_STATE, SENSOR_ADE9000, 0, (uint32_t)SENSOR_STATUS_CONFIGURED);
-		pl_event_set(&cmd_events, CMD_SEND_STATUS_CHANGE);
+		absl_event_set(&cmd_events, CMD_SEND_STATUS_CHANGE);
 	}
 	if (SYSTEM_RAW_STATE_RUNNING == (events & SYSTEM_RAW_STATE_RUNNING))
 	{
 		system_handler_state_change_info_send(SERVICE_STATE, SENSOR_ADE9000, SERVICE_RAW, (uint32_t)SERVICE_STATUS_RUNNING);
-		pl_event_set(&cmd_events, CMD_SEND_STATUS_CHANGE);
+		absl_event_set(&cmd_events, CMD_SEND_STATUS_CHANGE);
 	}
 	if (SYSTEM_RAW_STATE_STOPPED == (events & SYSTEM_RAW_STATE_STOPPED))
 	{
 		system_handler_state_change_info_send(SERVICE_STATE, SENSOR_ADE9000, SERVICE_RAW, (uint32_t)SERVICE_STATUS_IDLE);
-		pl_event_set(&cmd_events, CMD_SEND_STATUS_CHANGE);
+		absl_event_set(&cmd_events, CMD_SEND_STATUS_CHANGE);
 	}
 	if (SYSTEM_REG_STATE_RUNNING == (events & SYSTEM_REG_STATE_RUNNING))
 	{
 		system_handler_state_change_info_send(SERVICE_STATE, SENSOR_ADE9000, SERVICE_REGISTERS, (uint32_t)SERVICE_STATUS_RUNNING);
-		pl_event_set(&cmd_events, CMD_SEND_STATUS_CHANGE);
+		absl_event_set(&cmd_events, CMD_SEND_STATUS_CHANGE);
 	}
 	if (SYSTEM_REG_STATE_STOPPED == (events & SYSTEM_REG_STATE_STOPPED))
 	{
 		system_handler_state_change_info_send(SERVICE_STATE, SENSOR_ADE9000, SERVICE_REGISTERS, (uint32_t)SERVICE_STATUS_IDLE);
-		pl_event_set(&cmd_events, CMD_SEND_STATUS_CHANGE);
+		absl_event_set(&cmd_events, CMD_SEND_STATUS_CHANGE);
 	}
 	if(SYSTEM_CONNECTION_TO_SERVER_LOST == (events & SYSTEM_CONNECTION_TO_SERVER_LOST))
 	{
@@ -1638,10 +1638,10 @@ static void system_handler_events_handling(void)
 
 		if(SYSTEM_FW_UPDATE_STATE == system_state_before_disconnection)
 		{
-			pl_system_get_fwu_clear_flag();
+			absl_system_get_fwu_clear_flag();
 			system_handler_process_event(sh_event_info[SH_EVENTS_FW_UPDATE_DISCONNECTION], NULL);
-			pl_event_set(&fw_update_events, FW_UPDATE_RESET_FW_UPDATE);
-			if(PL_EVENT_RV_OK != pl_event_timed_wait(&system_events, SYSTEM_FW_AREA_ERASED, &events, SYSTEM_AREA_DELETE_WAIT_MS))
+			absl_event_set(&fw_update_events, FW_UPDATE_RESET_FW_UPDATE);
+			if(ABSL_EVENT_RV_OK != absl_event_timed_wait(&system_events, SYSTEM_FW_AREA_ERASED, &events, SYSTEM_AREA_DELETE_WAIT_MS))
 			{
 				system_handler_process_event(sh_event_info[SH_EVENTS_FLASH_AREA_DELETE_ERROR], NULL);
 			}
@@ -1649,7 +1649,7 @@ static void system_handler_events_handling(void)
 	}
 	if(SYSTEM_TO_FW_UPDATE == (events & SYSTEM_TO_FW_UPDATE))
 	{
-		pl_system_set_fwu_flag(SYSTEM_FW_UPDATE_STARTED_FLAG);
+		absl_system_set_fwu_flag(SYSTEM_FW_UPDATE_STARTED_FLAG);
 
 		system_handler_change_state(SYSTEM_FW_UPDATE_STATE, SYSTEM_FW_UPDATE_EVENTS, SYSTEM_FW_UPDATE_STATE_MSG);
 	}
@@ -1658,7 +1658,7 @@ static void system_handler_events_handling(void)
 		system_handler_state_change_info_send(SENSOR_STATE, SENSOR_ADE9000, 0, (uint32_t)SENSOR_STATUS_IDLE);
 		system_handler_state_change_info_send(SERVICE_STATE, SENSOR_ADE9000, SERVICE_RAW, (uint32_t)SERVICE_STATUS_IDLE);
 		system_handler_state_change_info_send(SERVICE_STATE, SENSOR_ADE9000, SERVICE_REGISTERS, (uint32_t)SERVICE_STATUS_IDLE);
-		pl_event_set(&cmd_events, CMD_SEND_STATUS_CHANGE);
+		absl_event_set(&cmd_events, CMD_SEND_STATUS_CHANGE);
 	}
 	if(SYSTEM_EVENT_TO_PROCESS == (events & SYSTEM_EVENT_TO_PROCESS))
 	{
@@ -1669,15 +1669,15 @@ static void system_handler_events_handling(void)
 		/* FW update could not done, because flash need to be erased.
 		   While erasing connection could be lost, so a disconnection is forced
 		   just to connecpl_system_initted after the erase of the memory */
-		pl_system_get_fwu_clear_flag();
+		absl_system_get_fwu_clear_flag();
 
-		pl_event_set(&cmd_events, CMD_SERVER_DISCONNECT);
+		absl_event_set(&cmd_events, CMD_SERVER_DISCONNECT);
 		system_connected_to_server = false;
 		system_handler_change_state(SYSTEM_WAIT_SERVER_STATE, SYSTEM_WAIT_SERVER_STATE_EVENTS, SYSTEM_WAIT_SERVER_STATE_MSG);
 
 		/* wait until flash ares is erased */
-		pl_event_set(&fw_update_events, FW_UPDATE_RESET_FW_UPDATE);
-		if(PL_EVENT_RV_OK != pl_event_timed_wait(&system_events, SYSTEM_FW_AREA_ERASED, &events, SYSTEM_AREA_DELETE_WAIT_MS))
+		absl_event_set(&fw_update_events, FW_UPDATE_RESET_FW_UPDATE);
+		if(ABSL_EVENT_RV_OK != absl_event_timed_wait(&system_events, SYSTEM_FW_AREA_ERASED, &events, SYSTEM_AREA_DELETE_WAIT_MS))
 		{
 			system_handler_process_event(sh_event_info[SH_EVENTS_FLASH_AREA_DELETE_ERROR], NULL);
 		}
@@ -1693,17 +1693,17 @@ static bool system_initialize(void)
 	enet_phy = PHY_AMOUNT - 1;
 	no_conn_event_num = 0;
 
-	pl_system_init();
+	absl_system_init();
 
-	nvm_config = pl_config_get_nvm_conf(PL_NVM_CONFIG);
+	nvm_config = absl_config_get_nvm_conf(ABSL_NVM_CONFIG);
 
-	if(PL_NVM_RV_OK == pl_nvm_init(&qspi_nvm, nvm_config))
+	if(ABSL_NVM_RV_OK == absl_nvm_init(&qspi_nvm, nvm_config))
 	{
-		if(PL_EVENT_RV_OK == pl_event_create(&system_events))
+		if(ABSL_EVENT_RV_OK == absl_event_create(&system_events))
 		{
-			if((PL_QUEUE_RV_OK == pl_queue_create(&events_info_queue, sizeof(event_info_t), 5)) &&
-			(PL_QUEUE_RV_OK == pl_queue_create(&send_states_queue, sizeof(state_change_data_t), 5)) &&
-			(PL_QUEUE_RV_OK == pl_queue_create(&send_alets_queue, sizeof(alert_data_t), 5)))
+			if((ABSL_QUEUE_RV_OK == absl_queue_create(&events_info_queue, sizeof(event_info_t), 5)) &&
+			(ABSL_QUEUE_RV_OK == absl_queue_create(&send_states_queue, sizeof(state_change_data_t), 5)) &&
+			(ABSL_QUEUE_RV_OK == absl_queue_create(&send_alets_queue, sizeof(alert_data_t), 5)))
 			{
 				event_handler_init(energy_sensors, &system_events, SYSTEM_EVENT_TO_PROCESS, &events_info_queue);
 				watchdog_initialize();
@@ -1716,25 +1716,25 @@ static bool system_initialize(void)
 				system_init_threads();
 				system_init_thread_spawn();
 
-				if(PHY_AMOUNT == pl_phy_get_init_phy_amount())
+				if(PHY_AMOUNT == absl_phy_get_init_phy_amount())
 				{
-					if(PL_PHY_RV_LINK_UP == pl_phy_check_link_state(enet_phy))
+					if(ABSL_PHY_RV_LINK_UP == absl_phy_check_link_state(enet_phy))
 					{
 						system_connected_eth = true;
 					}
-					pl_phy_set_link_down_event(enet_phy, &system_events, SYSTEM_LINK_LOST);
+					absl_phy_set_link_down_event(enet_phy, &system_events, SYSTEM_LINK_LOST);
 
 					init_done = true;
 				}
 			}
 			else
 			{
-				pl_hardfault_handler(QUEUE_CREATE_ERROR);
+				absl_hardfault_handler(QUEUE_CREATE_ERROR);
 			}
 		}
 		else
 		{
-			pl_hardfault_handler(EVENT_CREATE_ERROR);
+			absl_hardfault_handler(EVENT_CREATE_ERROR);
 		}
 	}
 
@@ -1762,16 +1762,16 @@ static void system_handler_check_manufacturer_info(void)
 	}
 
 	protocol_config.device_ID = manufacturing_data->id_mumber;
-	pl_hw_config_assign_phy_mac(manufacturing_data->mac_address);
+	absl_hw_config_assign_phy_mac(manufacturing_data->mac_address);
 	protocol_config.model = manufacturing_data->model;
 	cmd_config.hw_version = (void*)&manufacturing_data->hw_version[0];
 }
 
 static void system_link_check(void)
 {
-	if(PL_PHY_RV_LINK_UP == pl_phy_check_link(enet_phy))
+	if(ABSL_PHY_RV_LINK_UP == absl_phy_check_link(enet_phy))
 	{
-		pl_phy_assign_ip(enet_phy);
+		absl_phy_assign_ip(enet_phy);
 		system_connected_eth = true;
 	}
 	else
@@ -1784,15 +1784,15 @@ static void system_init_and_execute_led_thread(void)
 {
 	if(!led_handler_initialize(&status_led_thread))
 	{
-		pl_debug_printf("LED initialization failed!\r\n");
-		pl_hardfault_handler(THREAD_INIT_ERROR);
+		absl_debug_printf("LED initialization failed!\r\n");
+		absl_hardfault_handler(THREAD_INIT_ERROR);
 	}
 
-	if (PL_THREAD_RV_OK != pl_thread_create(&pl_status_led_thread, "LED task", led_handler_task,
+	if (ABSL_THREAD_RV_OK != absl_thread_create(&absl_status_led_thread, "LED task", led_handler_task,
 						LED_HANDLER_PRIORITY, LED_HANDLER_STACK_SIZE, &status_led_thread))
 	{
-		pl_debug_printf("FW update task creation failed!.\r\n");
-		pl_hardfault_handler(THREAD_CREATE_ERROR);
+		absl_debug_printf("FW update task creation failed!.\r\n");
+		absl_hardfault_handler(THREAD_CREATE_ERROR);
 	}
 }
 
@@ -1805,50 +1805,50 @@ static void system_init_threads(void)
 {
 	if(!energy_task_initialize(&energy_config))
 	{
-		pl_debug_printf("Energy task initialization failed!\r\n");
-		pl_hardfault_handler(THREAD_INIT_ERROR);
+		absl_debug_printf("Energy task initialization failed!\r\n");
+		absl_hardfault_handler(THREAD_INIT_ERROR);
 	}
 
 	if(!vars_read_task_initialize(&fast_vars_read_thread_config))
 	{
-		pl_debug_printf("Fast vars reading task initialization failed!\r\n");
-		pl_hardfault_handler(THREAD_INIT_ERROR);
+		absl_debug_printf("Fast vars reading task initialization failed!\r\n");
+		absl_hardfault_handler(THREAD_INIT_ERROR);
 	}
 	
 	if(!vars_read_task_initialize(&slow_vars_read_thread_config))
 	{
-		pl_debug_printf("Slow vars reading task initialization failed!\r\n");
-		pl_hardfault_handler(THREAD_INIT_ERROR);
+		absl_debug_printf("Slow vars reading task initialization failed!\r\n");
+		absl_hardfault_handler(THREAD_INIT_ERROR);
 	}
 
 	if(!streaming_task_initialize(&fast_stream_thread_data, &fast_streaming_config))
 	{
-		pl_debug_printf("Fast vars streaming task initialization failed!\r\n");
-		pl_hardfault_handler(THREAD_INIT_ERROR);
+		absl_debug_printf("Fast vars streaming task initialization failed!\r\n");
+		absl_hardfault_handler(THREAD_INIT_ERROR);
 	}
 
 	if(!streaming_task_initialize(&slow_stream_thread_data, &slow_streaming_config))
 	{
-		pl_debug_printf("Slow vars streaming task initialization failed!\r\n");
-		pl_hardfault_handler(THREAD_INIT_ERROR);
+		absl_debug_printf("Slow vars streaming task initialization failed!\r\n");
+		absl_hardfault_handler(THREAD_INIT_ERROR);
 	}
 
 	if(!cmd_task_initialize(&cmd_config))
 	{
-		pl_debug_printf("Commands task initialization failed!\r\n");
-		pl_hardfault_handler(THREAD_INIT_ERROR);
+		absl_debug_printf("Commands task initialization failed!\r\n");
+		absl_hardfault_handler(THREAD_INIT_ERROR);
 	}
 
 	if(!fw_update_task_initialize(&fw_update_config))
 	{
-		pl_debug_printf("FW update task initialization failed!\r\n");
-		pl_hardfault_handler(THREAD_INIT_ERROR);
+		absl_debug_printf("FW update task initialization failed!\r\n");
+		absl_hardfault_handler(THREAD_INIT_ERROR);
 	}
 
 	if(!time_sync_initialize(&timesync_config))
 	{
-		pl_debug_printf("Time sync initialization failed!\r\n");
-		pl_hardfault_handler(THREAD_INIT_ERROR);
+		absl_debug_printf("Time sync initialization failed!\r\n");
+		absl_hardfault_handler(THREAD_INIT_ERROR);
 	}
 
 	system_handler_get_and_proccess_event();
@@ -1856,62 +1856,62 @@ static void system_init_threads(void)
 
 static void system_init_thread_spawn(void)
 {
-	pl_debug_printf("Spawning threads!\n");
+	absl_debug_printf("Spawning threads!\n");
 
-	if (PL_THREAD_RV_OK != pl_thread_create(&timesync_thread, "timesync", time_sync_task,
+	if (ABSL_THREAD_RV_OK != absl_thread_create(&timesync_thread, "timesync", time_sync_task,
 											TIMESYNC_PRIORITY, TIMESYNC_STACK_SIZE, &system_state))
 	{
-		pl_debug_printf("Timesync creation failed!.\r\n");
-		pl_hardfault_handler(THREAD_CREATE_ERROR);
+		absl_debug_printf("Timesync creation failed!.\r\n");
+		absl_hardfault_handler(THREAD_CREATE_ERROR);
 	}
 
-	if (PL_THREAD_RV_OK != pl_thread_create(&energy_thread, "Energy task", energy_task,
+	if (ABSL_THREAD_RV_OK != absl_thread_create(&energy_thread, "Energy task", energy_task,
 						   ENERGY_TASK_PRIORITY, ENERGY_TASK_STACK_SIZE, &system_state))
 	{
-		pl_debug_printf("Energy task creation failed!.\r\n");
-		pl_hardfault_handler(THREAD_CREATE_ERROR);
+		absl_debug_printf("Energy task creation failed!.\r\n");
+		absl_hardfault_handler(THREAD_CREATE_ERROR);
 	}
 
-	if (PL_THREAD_RV_OK != pl_thread_create(&fast_vars_read_thread, "Fast vars read", vars_read_task,
+	if (ABSL_THREAD_RV_OK != absl_thread_create(&fast_vars_read_thread, "Fast vars read", vars_read_task,
 											FAST_READ_TASK_PRIORITY, FAST_READ_TASK_STACK_SIZE, (void*)&fast_vars_read))
 	{
-		pl_debug_printf("Fast vars reading task creation failed!.\r\n");
-		pl_hardfault_handler(THREAD_CREATE_ERROR);
+		absl_debug_printf("Fast vars reading task creation failed!.\r\n");
+		absl_hardfault_handler(THREAD_CREATE_ERROR);
 	}
 
-	if (PL_THREAD_RV_OK != pl_thread_create(&slow_vars_read_thread, "Slow vars read", vars_read_task,
+	if (ABSL_THREAD_RV_OK != absl_thread_create(&slow_vars_read_thread, "Slow vars read", vars_read_task,
 						   				    SLOW_READ_TASK_PRIORITY, SLOW_READ_TASK_STACK_SIZE, (void*)&slow_vars_read))
 	{
-		pl_debug_printf("Slow vars task creation failed!.\r\n");
-		pl_hardfault_handler(THREAD_CREATE_ERROR);
+		absl_debug_printf("Slow vars task creation failed!.\r\n");
+		absl_hardfault_handler(THREAD_CREATE_ERROR);
 	}
 
-	if (PL_THREAD_RV_OK != pl_thread_create(&fast_stream_thread, "fast stream task", streaming_task,
+	if (ABSL_THREAD_RV_OK != absl_thread_create(&fast_stream_thread, "fast stream task", streaming_task,
 						   FAST_STREAM_TASK_PRIORITY, FAST_STREAM_TASK_STACK_SIZE, (void*)&fast_stream))
 	{
-		pl_debug_printf("Streaming task creation failed!.\r\n");
-		pl_hardfault_handler(THREAD_CREATE_ERROR);
+		absl_debug_printf("Streaming task creation failed!.\r\n");
+		absl_hardfault_handler(THREAD_CREATE_ERROR);
 	}
 
-	if (PL_THREAD_RV_OK != pl_thread_create(&slow_stream_thread, "slow stream task", streaming_task,
+	if (ABSL_THREAD_RV_OK != absl_thread_create(&slow_stream_thread, "slow stream task", streaming_task,
 						   SLOW_STREAM_TASK_PRIORITY, SLOW_STREAM_TASK_STACK_SIZE, (void*)&slow_stream))
 	{
-		pl_debug_printf("Streaming task creation failed!.\r\n");
-		pl_hardfault_handler(THREAD_CREATE_ERROR);
+		absl_debug_printf("Streaming task creation failed!.\r\n");
+		absl_hardfault_handler(THREAD_CREATE_ERROR);
 	}
 
-	if (PL_THREAD_RV_OK != pl_thread_create(&cmd_thread, "Commands task", cmd_task,
+	if (ABSL_THREAD_RV_OK != absl_thread_create(&cmd_thread, "Commands task", cmd_task,
 							   CMD_TASK_PRIORITY, CMD_TASK_STACK_SIZE, &system_state))
 	{
-		pl_debug_printf("Commands task creation failed!.\r\n");
-		pl_hardfault_handler(THREAD_CREATE_ERROR);
+		absl_debug_printf("Commands task creation failed!.\r\n");
+		absl_hardfault_handler(THREAD_CREATE_ERROR);
 	}
 
-	if (PL_THREAD_RV_OK != pl_thread_create(&fw_update_thread, "FW update task", fw_update_task,
+	if (ABSL_THREAD_RV_OK != absl_thread_create(&fw_update_thread, "FW update task", fw_update_task,
 						   FW_UPDATE_TASK_PRIORITY, FW_UPDATE_TASK_STACK_SIZE, &system_state))
 	{
-		pl_debug_printf("FW update task creation failed!.\r\n");
-		pl_hardfault_handler(THREAD_CREATE_ERROR);
+		absl_debug_printf("FW update task creation failed!.\r\n");
+		absl_hardfault_handler(THREAD_CREATE_ERROR);
 	}
 }
 
@@ -1923,39 +1923,39 @@ static void system_init_thread_spawn(void)
  */
 static void watchdog_initialize(void)
 {
-	pl_system_reset_t reset_reason;
+	absl_system_reset_t reset_reason;
 
 	if(false == watchdog_init(&wdog_config))
 	{
-		pl_hardfault_handler(WDOG_INIT_ERROR);
+		absl_hardfault_handler(WDOG_INIT_ERROR);
 	}
 
-	reset_reason = pl_system_get_reset_reason();
+	reset_reason = absl_system_get_reset_reason();
 
 	switch (reset_reason)
 	{
-	case PL_SYSTEM_POWERUP_RESET:
+	case ABSL_SYSTEM_POWERUP_RESET:
 		system_handler_process_event(sh_event_info[SH_EVENTS_POWERUP_RESET], NULL);
 		break;
-	case PL_SYSTEM_SOFTWARE_RESET:
+	case ABSL_SYSTEM_SOFTWARE_RESET:
 		system_handler_process_event(sh_event_info[SH_EVENTS_SOFTWARE_RESET], NULL);
 		break;
-	case PL_SYSTEM_WDOG_TIMEOUT_RESET:
-		pl_debug_printf("\nWARNING!!! Watchdog timeout reset!!!\n");
+	case ABSL_SYSTEM_WDOG_TIMEOUT_RESET:
+		absl_debug_printf("\nWARNING!!! Watchdog timeout reset!!!\n");
 		system_handler_process_event(sh_event_info[SH_EVENTS_WDOG_RESET], NULL);
 		break;
-	case PL_SYSTEM_SECURITY_RESET:
-		pl_debug_printf("\nWARNING!!! Security reset!!!\n");
+	case ABSL_SYSTEM_SECURITY_RESET:
+		absl_debug_printf("\nWARNING!!! Security reset!!!\n");
 		system_handler_process_event(sh_event_info[SH_EVENTS_SECURITY_RESET], NULL);
 		break;
-	case PL_SYSTEM_JTAG_HW_RESET:
+	case ABSL_SYSTEM_JTAG_HW_RESET:
 		system_handler_process_event(sh_event_info[SH_EVENTS_JTAG_HW_RESET], NULL);
 		break;
-	case PL_SYSTEM_JTAG_SW_RESET:
+	case ABSL_SYSTEM_JTAG_SW_RESET:
 		system_handler_process_event(sh_event_info[SH_EVENTS_JTAG_SW_RESET], NULL);
 		break;
-	case PL_SYSTEM_TEMPSENSE_RESET:
-		pl_debug_printf("\nWARNING!!! Temperature sensor reset!!!\n");
+	case ABSL_SYSTEM_TEMPSENSE_RESET:
+		absl_debug_printf("\nWARNING!!! Temperature sensor reset!!!\n");
 		system_handler_process_event(sh_event_info[SH_EVENTS_TEMPSENSE_RESET], NULL);
 		break;
 	default:
@@ -1967,7 +1967,7 @@ static void watchdog_initialize(void)
 
 static void system_hardfault_error_reset_check(void)
 {
-	uint32_t hardfault_error = pl_system_get_hf_error_flag();
+	uint32_t hardfault_error = absl_system_get_hf_error_flag();
 
 	switch(hardfault_error)
 	{
@@ -2105,9 +2105,9 @@ static void system_handler_change_state(system_states_t _new_state, uint32_t _st
 	system_state = _new_state;
 	state_events = _state_events;
 	
-	pl_event_clear_events(&system_events, SYSTEM_EVENTS_TO_CLEAR);
+	absl_event_clear_events(&system_events, SYSTEM_EVENTS_TO_CLEAR);
 
-	pl_debug_printf(_dbg_message);
+	absl_debug_printf(_dbg_message);
 }
 
 static void system_handler_get_and_proccess_event(void)
@@ -2117,20 +2117,20 @@ static void system_handler_get_and_proccess_event(void)
 
 	bool error = false;
 
-	while(PL_QUEUE_RV_OK == pl_queue_receive(&events_info_queue, (void*)&system_event, PL_QUEUE_NO_DELAY))
+	while(ABSL_QUEUE_RV_OK == absl_queue_receive(&events_info_queue, (void*)&system_event, ABSL_QUEUE_NO_DELAY))
 	{
 		event_to_give |= system_handler_process_event(system_event, &error);
 	}
 
 	if(true == error)
 	{
-		pl_queue_send(&send_states_queue, (void*)&send_data.state_change_data, PL_QUEUE_MAX_DELAY);
+		absl_queue_send(&send_states_queue, (void*)&send_data.state_change_data, ABSL_QUEUE_MAX_DELAY);
 		system_handler_evaluate_error(send_data.state_change_data);
 	}
 
 	if(event_to_give != 0)
 	{
-		pl_event_set(&cmd_events, event_to_give);
+		absl_event_set(&cmd_events, event_to_give);
 	}
 }
 
@@ -2176,12 +2176,12 @@ static void system_handler_send_no_conn_events(void)
 
 	if(true == error)
 	{
-		pl_queue_send(&send_states_queue, (void*)&send_data.state_change_data, PL_QUEUE_MAX_DELAY);
+		absl_queue_send(&send_states_queue, (void*)&send_data.state_change_data, ABSL_QUEUE_MAX_DELAY);
 		system_handler_evaluate_error(send_data.state_change_data);
 	}
 
 	no_conn_event_num = 0;
-	pl_event_set(&cmd_events, event_to_give);
+	absl_event_set(&cmd_events, event_to_give);
 }
 
 static uint32_t system_handler_send_event(event_info_t _system_event, bool* _error_detected)
@@ -2202,7 +2202,7 @@ static uint32_t system_handler_send_event(event_info_t _system_event, bool* _err
 	{
 		send_data.alert_data = event_data.data.alert_data;
 
-		pl_queue_send(&send_alets_queue, (void*)&send_data.alert_data, PL_QUEUE_MAX_DELAY);
+		absl_queue_send(&send_alets_queue, (void*)&send_data.alert_data, ABSL_QUEUE_MAX_DELAY);
 		event_to_give = CMD_SEND_ALERT;
 	}
 	else
@@ -2261,5 +2261,5 @@ static void system_handler_state_change_info_send(state_type_t _state_type, sens
 	}
 	
 	send_data.state_change_data = state_change;
-	pl_queue_send(&send_states_queue, (void*)&send_data.state_change_data, PL_QUEUE_MAX_DELAY);
+	absl_queue_send(&send_states_queue, (void*)&send_data.state_change_data, ABSL_QUEUE_MAX_DELAY);
 }

@@ -1,0 +1,7 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_nvm_imxrt10xx.c:14:13:absl_nvm_init_imxrt10xx	8	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_nvm_imxrt10xx.c:36:6:absl_nvm_read_imxrt10xx	4	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_nvm_imxrt10xx.c:43:13:absl_nvm_write_imxrt10xx	40	dynamic
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_nvm_imxrt10xx.c:84:13:absl_nvm_erase_imxrt10xx	16	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_nvm_imxrt10xx.c:109:10:absl_nvm_get_page_size_imxrt10xx	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_nvm_imxrt10xx.c:114:10:absl_nvm_get_offset_imxrt10xx	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_nvm_imxrt10xx.c:119:10:absl_nvm_get_size_imxrt10xx	0	static

@@ -1,0 +1,4 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/debug/debug_shell.c:40:6:debug_shell_initialize	8	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/debug/debug_shell.c:60:6:debug_shell_add_commads	24	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/debug/debug_shell.c:71:6:debug_shell	8	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/debug/debug_shell.c:103:6:debug_shell_finish	0	static

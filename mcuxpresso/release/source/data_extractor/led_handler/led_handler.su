@@ -1,0 +1,3 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/led_handler/led_handler.c:50:6:led_handler_toggle_event	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/led_handler/led_handler.c:67:6:led_handler_initialize	64	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/led_handler/led_handler.c:119:6:led_handler_task	80	static

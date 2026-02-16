@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# shellcheck disable=SC2154
+arm-none-eabi-size "${BuildArtifactFileName}"
+arm-none-eabi-objcopy -v -O ihex "${BuildArtifactFileName}" "${BuildArtifactFileBaseName}.hex"
+arm-none-eabi-objcopy -v -O binary "${BuildArtifactFileName}" "${BuildArtifactFileBaseName}.bin"
+checksum -p "${TargetChip}" -d "${BuildArtifactFileBaseName}.bin"
+rm -rf "${ProjDirTopLevel:?}/bin"
+mkdir -p "${ProjDirTopLevel}/bin"
+"${ProjDirTopLevel}/scripts/sbl_compiler.sh"
+cp "${ProjDirTopLevel}/mcuxpresso/source/board/board.c" "${ProjDirTopLevel}/sbl/target/evkmimxrt1060/board/board.c"
+cp "${ProjDirTopLevel}/mcuxpresso/source/board/board.h" "${ProjDirTopLevel}/sbl/target/evkmimxrt1060/board/board.h"
+cp "${ProjDirTopLevel}/mcuxpresso/source/board/clock_config.c" "${ProjDirTopLevel}/sbl/target/evkmimxrt1060/board/MCUX_Config/clock_config.c"
+cp "${ProjDirTopLevel}/mcuxpresso/source/board/clock_config.h" "${ProjDirTopLevel}/sbl/target/evkmimxrt1060/board/MCUX_Config/clock_config.h"
+cp "${ProjDirTopLevel}/mcuxpresso/source/board/pin_mux.c" "${ProjDirTopLevel}/sbl/target/evkmimxrt1060/board/MCUX_Config/pin_mux.c"
+cp "${ProjDirTopLevel}/mcuxpresso/source/board/pin_mux.h" "${ProjDirTopLevel}/sbl/target/evkmimxrt1060/board/MCUX_Config/pin_mux.h"
+cp "${ProjDirTopLevel}/platform/imxrt1062/xip/evkmimxrt1060_flexspi_nor_config.c" "${ProjDirTopLevel}/sbl/target/evkmimxrt1060/board/xip/evkmimxrt1060_flexspi_nor_config.c"
+cp "${ProjDirTopLevel}/platform/imxrt1062/xip/evkmimxrt1060_flexspi_nor_config.h" "${ProjDirTopLevel}/sbl/target/evkmimxrt1060/board/xip/evkmimxrt1060_flexspi_nor_config.h"
+cp "${ProjDirTopLevel}/platform/imxrt1062/xip/fsl_flexspi_nor_boot.c" "${ProjDirTopLevel}/sbl/target/evkmimxrt1060/board/xip/fsl_flexspi_nor_boot.c"
+cp "${ProjDirTopLevel}/platform/imxrt1062/xip/fsl_flexspi_nor_boot.h" "${ProjDirTopLevel}/sbl/target/evkmimxrt1060/board/xip/fsl_flexspi_nor_boot.h"
+cp "${ProjDirTopLevel}/mcuxpresso/source/sbl/scripts/xxxx_pub.c" "${ProjDirTopLevel}/sbl/component/secure/mcuboot/sign-rsa2048-pub.c"
+cp "${ProjDirTopLevel}/mcuxpresso/source/sbl/sblconfig.h" "${ProjDirTopLevel}/sbl/target/evkmimxrt1060/sblconfig.h"
+rm -rf "${ProjDirTopLevel}/sbl/target/evkmimxrt1060/build/sbl.bin"
+scons -C "${ProjDirTopLevel}/sbl/target/evkmimxrt1060/"
+python3 "${ProjDirPath}/source/sbl/scripts/imgtool.py" sign --key "${ProjDirPath}/source/sbl/scripts/xxxx_priv.pem" --align 4 --version "1.1.0" --header-size 0x400 --pad-header --slot-size 0x200000 --max-sectors 32 "${BuildArtifactFileBaseName}.bin" "${ProjDirTopLevel}/bin/ADE9000_data_extractor.bin"
+python3 "${ProjDirTopLevel}/scripts/merge_bin_esp.py" --output_name boot_ADE9000_data_extractor.bin --bin_path "${ProjDirTopLevel}/sbl/target/evkmimxrt1060/build/sbl.bin" "${ProjDirTopLevel}/bin/ADE9000_data_extractor.bin" --bin_address 0x60000000 0x60100000
+python3 "${ProjDirTopLevel}/scripts/bin2hex.py"  output/boot_ADE9000_data_extractor.bin "${ProjDirTopLevel}/bin/boot_ADE9000_data_extractor.hex"
+mv output/boot_ADE9000_data_extractor.bin "${ProjDirTopLevel}/bin/boot_ADE9000_data_extractor.bin"

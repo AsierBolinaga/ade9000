@@ -10,8 +10,8 @@
 
 #include "sensors_types.h"
 
-#include "pl_time.h"
-#include "pl_event.h"
+#include "absl_time.h"
+#include "absl_event.h"
 
 typedef enum ade9000_events
 {
@@ -34,7 +34,7 @@ typedef enum ade9000_events
 	 ADE9000_EVENTS_MAXVALUE
 }ade9000_events_t;
 
-bool ade9000_init(energy_sensor_init_conf_t* _ade9000_conf, pl_event_t* _event_group, uint32_t _fast_event_mask, uint32_t _slow_evet_mask);
+bool ade9000_init(energy_sensor_init_conf_t* _ade9000_conf, absl_event_t* _event_group, uint32_t _fast_event_mask, uint32_t _slow_evet_mask);
 void ade9000_set_i_buff_position(ade9000_phases_t _phase, uint32_t _buf_pos);
 void ade9000_set_v_buff_position(ade9000_phases_t _phase, uint32_t _buf_pos);
 void ade9000_set_s_buff_position(ade9000_phases_t _phase, uint32_t _buf_pos);
@@ -49,7 +49,7 @@ bool ade9000_read_waveform(void* _fast_vars_config, void* _waveform_data);
 void ade9000_clear_waveform(void);
 bool ade9000_read_slow_variables(void* _slow_vars_config, void* _slow_vars_data);
 void ade9000_clear_slow_vars(void);
-pl_time_t ade9000_get_event_time(void);
+absl_time_t ade9000_get_event_time(void);
 uint64_t ade9000_get_event_time_ns(void);
 
 void ade9000_calc_i(ade9000_phases_t _phase, int _sample, int32_t* _data_pos);

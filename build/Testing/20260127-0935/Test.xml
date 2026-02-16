@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Site BuildName="(empty)"
+	BuildStamp="20260127-0935-Experimental"
+	Name="(empty)"
+	Generator="ctest-3.28.3"
+	CompilerName=""
+	CompilerVersion=""
+	OSName="Linux"
+	Hostname="abolinaga-PC"
+	OSRelease="6.14.0-37-generic"
+	OSVersion="#37~24.04.1-Ubuntu SMP PREEMPT_DYNAMIC Thu Nov 20 10:25:38 UTC 2"
+	OSPlatform="x86_64"
+	Is64Bits="1"
+	VendorString="GenuineIntel"
+	VendorID="Intel Corporation"
+	FamilyID="6"
+	ModelID="140"
+	ProcessorCacheSize="12288"
+	NumberOfLogicalCPU="8"
+	NumberOfPhysicalCPU="4"
+	TotalVirtualMemory="8191"
+	TotalPhysicalMemory="63988"
+	LogicalProcessorsPerPhysical="2"
+	ProcessorClockFrequency="4025.14"
+	>
+	<Testing>
+		<StartDateTime>Jan 27 10:35 CET</StartDateTime>
+		<StartTestTime>1769506523</StartTestTime>
+		<TestList/>
+		<EndDateTime>Jan 27 10:35 CET</EndDateTime>
+		<EndTestTime>1769506523</EndTestTime>
+		<ElapsedMinutes>0</ElapsedMinutes>
+	</Testing>
+</Site>

@@ -8,7 +8,7 @@
 #ifndef SENSORS_TYPES_H_
 #define SENSORS_TYPES_H_
 
-#include "pl_types.h"
+#include "absl_types.h"
 
 #define ENERGY_VARS_DATA_SIZE (300)
 

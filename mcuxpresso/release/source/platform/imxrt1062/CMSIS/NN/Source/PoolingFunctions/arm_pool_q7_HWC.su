@@ -1,0 +1,4 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/CMSIS/NN/Source/PoolingFunctions/arm_pool_q7_HWC.c:52:13:compare_and_replace_if_larger_q7	48	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/CMSIS/NN/Source/PoolingFunctions/arm_pool_q7_HWC.c:96:13:accumulate_q7_to_q15	56	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/CMSIS/NN/Source/PoolingFunctions/arm_pool_q7_HWC.c:170:6:arm_maxpool_q7_HWC	72	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/CMSIS/NN/Source/PoolingFunctions/arm_pool_q7_HWC.c:326:6:arm_avepool_q7_HWC	88	static

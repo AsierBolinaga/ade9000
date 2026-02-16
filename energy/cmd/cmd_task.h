@@ -12,9 +12,9 @@
  ******************************************************************************/
 #include "protocol_types.h"
 
-#include "pl_queue.h"
-#include "pl_event.h"
-#include "pl_mutex.h"
+#include "absl_queue.h"
+#include "absl_event.h"
+#include "absl_mutex.h"
 
 /******************************************************************************
  * Defines
@@ -74,22 +74,22 @@ typedef struct cmd_thread_config
 {
 	protocol_config_t*	    protocol_config;
 	void *					hw_version;
-	pl_queue_t*				states_queue;
-	pl_queue_t*				alets_queue;
-	pl_event_t*				cmd_events;
-	pl_event_t*				system_events;
+	absl_queue_t*				states_queue;
+	absl_queue_t*				alets_queue;
+	absl_event_t*				cmd_events;
+	absl_event_t*				system_events;
 	uint32_t				connected_event;
 	uint32_t				no_server_event;
 	uint32_t				fw_update_event;
 	uint32_t				disconnected_event;
-	pl_event_t**			sensor_event_groups;
+	absl_event_t**			sensor_event_groups;
 	uint32_t*				config_events;
 	uint32_t*				reset_events;
 	uint32_t**				start_events;
 	uint32_t**				stop_events;
-	pl_event_t*				timesync_events;
+	absl_event_t*				timesync_events;
 	uint32_t				sync_event;
-	pl_event_t*				fw_update_events;
+	absl_event_t*				fw_update_events;
 	uint32_t				fw_file_chunk_received;
 	uint32_t				fw_file_reception_finished;
 	cmd_task_states_t*		sensor_to_task_state;

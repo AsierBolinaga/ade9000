@@ -1,0 +1,78 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "ADE9000 raw",
+    "type": "object",
+    "properties": {
+        "config": {
+            "title": "",
+            "type": "object",
+            "properties": {
+                "vars": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "enum": [
+                        "IA[A]",
+                        "IB[A]",
+                        "IC[A]",
+                        "VA[V]",
+                        "VB[V]",
+                        "VC[V]",
+                        "SA[VA]",
+                        "SB[VA]",
+                        "SC[VA]",
+                        "PA[W]",
+                        "PB[W]",
+                        "PC[W]",
+                        "QA[VAR]",
+                        "QB[VAR]",
+                        "QC[VAR]"
+                    ],
+                    "title": "Vars"
+                }
+            },
+            "required": ["vars"]
+        },
+        "transmission": {
+            "title": "",
+            "type": "object",
+            "properties": {
+                "settings": {
+                    "title": "",
+                    "type": "object",
+                    "properties": {
+                        "IP": {
+                            "description": "Destination IP address",
+                            "type": "string",
+                            "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+                            "title": "IP"
+                        },
+                        "port": {
+                            "description": "Destination port",
+                            "title": "Port",
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 65535
+                        }
+                    },
+                    "required": ["IP", "port"]
+                },
+                "format": {
+                    "description": "Data format",
+                    "type": "string",
+                    "enum": ["binary"],
+                    "title": "Format"
+                },
+                "protocol": {
+                    "description": "Communication protocol",
+                    "type": "string",
+                    "enum": ["udp", "tcp"],
+                    "title": "Protocol"
+                }
+            },
+            "required": ["format", "protocol", "settings"]
+        }
+    },
+    "required": ["config", "transmission"]
+}

@@ -21,9 +21,9 @@
 
 #include "system_handler.h"
 
-#include "pl_system.h"
-#include "pl_thread.h"
-#include "pl_debug.h"
+#include "absl_system.h"
+#include "absl_thread.h"
+#include "absl_debug.h"
 
 /*******************************************************************************
  * Definitions
@@ -38,7 +38,7 @@
 /*******************************************************************************
  * Variables
  ******************************************************************************/
-static pl_thread_t system_init_thread;
+static absl_thread_t system_init_thread;
 
 /*******************************************************************************
  * Code
@@ -87,17 +87,17 @@ int main(void)
 
 	mdio_init();
 
-    pl_debug_printf("\r\n\n******** System Start ********\r\n");
+    absl_debug_printf("\r\n\n******** System Start ********\r\n");
 
-    if (PL_THREAD_RV_OK != pl_thread_create(&system_init_thread, "System init", system_handler,
+    if (ABSL_THREAD_RV_OK != absl_thread_create(&system_init_thread, "System init", system_handler,
        		               SYSTEM_THREAD_PRIO, SYSTEM_THREAD_STACKSIZE, NULL))
 	{
-    	pl_hardfault_handler(0);
+    	absl_hardfault_handler(0);
 	}
 
-	pl_thread_run();
+	absl_thread_run();
 
-	pl_hardfault_handler(0);
+	absl_hardfault_handler(0);
 
 	return 0;
 }

@@ -1,0 +1,6 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/component/flashiap/flash_api.c:26:5:flash_device_base	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/component/flashiap/flash_api.c:36:5:flash_area_open	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/component/flashiap/flash_api.c:50:6:flash_area_close	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/component/flashiap/flash_api.c:125:5:flash_area_get_sectors	12	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/component/flashiap/flash_api.c:168:5:flash_area_id_from_image_slot	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/component/flashiap/flash_api.c:180:5:flash_area_id_to_image_slot	0	static

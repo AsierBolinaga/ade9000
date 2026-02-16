@@ -9,13 +9,13 @@
 
 #include "interfaces.h"
 
-#include "pl_system.h"
-#include "pl_debug.h"
-#include "pl_timer.h"
-#include "pl_macros.h"
-#include "pl_hw_config.h"
+#include "absl_system.h"
+#include "absl_debug.h"
+#include "absl_timer.h"
+#include "absl_macros.h"
+#include "absl_hw_config.h"
 #ifdef DEBUG_PIN
-#include "pl_gpio.h"
+#include "absl_gpio.h"
 #endif
 
 /*******************************************************************************
@@ -28,14 +28,14 @@
 /*******************************************************************************
  * Variables
  ******************************************************************************/
-static pl_timer_t	timer_reconnect_timeout;
+static absl_timer_t	timer_reconnect_timeout;
 static bool			reconnect_timeout;
 
 static uint8_t		error_count;
 
 #ifdef DEBUG_PIN
-static pl_gpio_t            debug_gpio;
-static pl_gpio_config_t*    debug_gpio_config;
+static absl_gpio_t            debug_gpio;
+static absl_gpio_config_t*    debug_gpio_config;
 #endif
 
 /*******************************************************************************
@@ -49,7 +49,7 @@ static void streaming_send_tcp(streaming_thread_data_t* _stream_thread_data, str
  ******************************************************************************/
 void streaming_task_reconnect_timeout(void* arg)
 {
-	PL_UNUSED_ARG(arg);
+	ABSL_UNUSED_ARG(arg);
 
 	reconnect_timeout = true;
 }
@@ -58,16 +58,16 @@ bool streaming_task_initialize(streaming_thread_data_t* _streaming_task_data, st
 {
 	bool return_value = false;
 
-	pl_time_t reconnect_timeout_time;
+	absl_time_t reconnect_timeout_time;
 
 	if(NULL != _streaming_task_config)
 	{
-		if((PL_EVENT_RV_OK == pl_event_create(_streaming_task_config->stream_events)) &&
-		   (PL_QUEUE_RV_OK == pl_queue_create(_streaming_task_config->stream_data_queue, _streaming_task_config->queue_data_size,
+		if((ABSL_EVENT_RV_OK == absl_event_create(_streaming_task_config->stream_events)) &&
+		   (ABSL_QUEUE_RV_OK == absl_queue_create(_streaming_task_config->stream_data_queue, _streaming_task_config->queue_data_size,
 				   	   	   	   	   	   	      _streaming_task_config->queue_data_amount)))
 		{
-			_streaming_task_data->socket_stream_config = pl_config_get_socket_conf(_streaming_task_config->stream_socket_index);
-			if(PL_SOCKET_RV_OK == pl_socket_init(&_streaming_task_data->pl_socket_stream, _streaming_task_data->socket_stream_config))
+			_streaming_task_data->socket_stream_config = absl_config_get_socket_conf(_streaming_task_config->stream_socket_index);
+			if(ABSL_SOCKET_RV_OK == absl_socket_init(&_streaming_task_data->absl_socket_stream, _streaming_task_data->socket_stream_config))
 			{
 				_streaming_task_data->not_send_count = 0;
 
@@ -76,16 +76,16 @@ bool streaming_task_initialize(streaming_thread_data_t* _streaming_task_data, st
 				reconnect_timeout_time.seconds = 0;
 				reconnect_timeout_time.nseconds = 500000000;
 
-				pl_timer_create(&timer_reconnect_timeout, &streaming_task_reconnect_timeout, NULL,
+				absl_timer_create(&timer_reconnect_timeout, &streaming_task_reconnect_timeout, NULL,
 						        reconnect_timeout_time, false, false);
 
 				error_count = 0;
 
 #ifdef DEBUG_PIN
-				debug_gpio_config = pl_config_get_gpio_conf(_streaming_task_config->debug_gpio_index);
+				debug_gpio_config = absl_config_get_gpio_conf(_streaming_task_config->debug_gpio_index);
 
-				pl_gpio_init(&debug_gpio, debug_gpio_config, PL_GPIO_NO_INT);
-				pl_gpio_off(&debug_gpio);
+				absl_gpio_init(&debug_gpio, debug_gpio_config, ABSL_GPIO_NO_INT);
+				absl_gpio_off(&debug_gpio);
 #endif
 
 				return_value = true;
@@ -113,19 +113,19 @@ void streaming_task(void *arg)
 
 	if(!stream_thread_config->stream_initialized)
 	{
-		pl_debug_printf("ERROR! streaming thread has not been initialized!\n");
-		pl_hardfault_handler(THREAD_NOT_INIT_ERROR);
+		absl_debug_printf("ERROR! streaming thread has not been initialized!\n");
+		absl_hardfault_handler(THREAD_NOT_INIT_ERROR);
 	}
 
-	pl_socket_create(&stream_thread_data->pl_socket_stream);
+	absl_socket_create(&stream_thread_data->absl_socket_stream);
 
 	while (1)
 	{
-		if(PL_EVENT_RV_OK == pl_event_wait(stream_thread_config->stream_events, STREAM_EVENTS, &event_flags))
+		if(ABSL_EVENT_RV_OK == absl_event_wait(stream_thread_config->stream_events, STREAM_EVENTS, &event_flags))
 		{
 			if(STREAM_DATA == (event_flags & STREAM_DATA))
 			{
-				while(PL_QUEUE_RV_OK == pl_queue_receive(stream_thread_config->stream_data_queue, stream_thread_config->stream_data, PL_QUEUE_NO_DELAY))
+				while(ABSL_QUEUE_RV_OK == absl_queue_receive(stream_thread_config->stream_data_queue, stream_thread_config->stream_data, ABSL_QUEUE_NO_DELAY))
 				{
 					if(PROTCOL_UDP == stream_thread_data->stream_config.protocol)
 					{
@@ -154,26 +154,26 @@ void streaming_task(void *arg)
 			{
 				stream_thread_data->stream_config = stream_thread_config->stream_config_cb();
 
-				if(true == pl_socket_check_ip(&stream_thread_data->pl_socket_stream, stream_thread_data->stream_config.ip))
+				if(true == absl_socket_check_ip(&stream_thread_data->absl_socket_stream, stream_thread_data->stream_config.ip))
 				{
 					if(PROTCOL_TCP == stream_thread_data->stream_config.protocol)
 					{
-						if(PL_SOCKET_RV_ERROR == pl_socket_connect(&stream_thread_data->pl_socket_stream,
+						if(ABSL_SOCKET_RV_ERROR == absl_socket_connect(&stream_thread_data->absl_socket_stream,
 																	stream_thread_data->stream_config.ip,
 																	stream_thread_data->stream_config.port))
 						{
 							/* TODO - add retries */
-							pl_event_set(stream_thread_config->service_event_group, stream_thread_config->could_not_connect_event);
+							absl_event_set(stream_thread_config->service_event_group, stream_thread_config->could_not_connect_event);
 							streaming_task_notify_system_event(stream_thread_config->event_info_array, ST_EVENTS_COULD_NOT_CONNECT_TCP);
 						}
 						else
 						{
-							pl_event_set(stream_thread_config->service_event_group, stream_thread_config->connected_event);
+							absl_event_set(stream_thread_config->service_event_group, stream_thread_config->connected_event);
 						}
 					}
 					else if(PROTCOL_UDP == stream_thread_data->stream_config.protocol)
 					{
-						pl_event_set(stream_thread_config->service_event_group, stream_thread_config->connected_event);
+						absl_event_set(stream_thread_config->service_event_group, stream_thread_config->connected_event);
 					}
 					else
 					{
@@ -182,7 +182,7 @@ void streaming_task(void *arg)
 				}
 				else
 				{
-					pl_event_set(stream_thread_config->service_event_group, stream_thread_config->could_not_connect_event);
+					absl_event_set(stream_thread_config->service_event_group, stream_thread_config->could_not_connect_event);
 					streaming_task_notify_system_event(stream_thread_config->event_info_array, ST_EVENTS_INCORRECT_IP);
 				}
 			}
@@ -190,7 +190,7 @@ void streaming_task(void *arg)
 			{
 				if(PROTCOL_TCP == stream_thread_data->stream_config.protocol)
 				{
-					pl_socket_tcp_close(&stream_thread_data->pl_socket_stream);
+					absl_socket_tcp_close(&stream_thread_data->absl_socket_stream);
 				}
 				else
 				{
@@ -205,7 +205,7 @@ static void streaming_send_udp(streaming_thread_data_t* _stream_thread_data, str
 {
 	if(FORMAT_BINARY == _stream_config.format)
 	{
-		if(PL_SOCKET_RV_ERROR == pl_socket_udp_transfer(&_stream_thread_data->pl_socket_stream, (char*)_data,
+		if(ABSL_SOCKET_RV_ERROR == absl_socket_udp_transfer(&_stream_thread_data->absl_socket_stream, (char*)_data,
 													_stream_config.data_size, _stream_config.ip, _stream_config.port))
 		{
 			_stream_thread_data->not_send_count++;
@@ -233,11 +233,11 @@ static void streaming_send_tcp(streaming_thread_data_t* _stream_thread_data, str
 {
 	uint32_t 		  data_length;
 
-	pl_socket_rv_t tcp_socket = pl_socket_tcp_check_state(&_stream_thread_data->pl_socket_stream);
+	absl_socket_rv_t tcp_socket = absl_socket_tcp_check_state(&_stream_thread_data->absl_socket_stream);
 
 	switch(tcp_socket)
 	{
-		case PL_SOCKET_RV_OK:
+		case ABSL_SOCKET_RV_OK:
 		{
 			_stream_thread_data->data_to_send.data_size = _stream_config.data_size;
 			memcpy(_stream_thread_data->data_to_send.paylod, _data, _stream_config.data_size);
@@ -245,7 +245,7 @@ static void streaming_send_tcp(streaming_thread_data_t* _stream_thread_data, str
 
 			if(FORMAT_BINARY == _stream_config.format)
 			{
-				if(PL_SOCKET_RV_ERROR == pl_socket_tcp_transfer(&_stream_thread_data->pl_socket_stream, (char*)&_stream_thread_data->data_to_send,
+				if(ABSL_SOCKET_RV_ERROR == absl_socket_tcp_transfer(&_stream_thread_data->absl_socket_stream, (char*)&_stream_thread_data->data_to_send,
 																data_length))
 				{
 					_stream_thread_data->not_send_count++;
@@ -269,27 +269,27 @@ static void streaming_send_tcp(streaming_thread_data_t* _stream_thread_data, str
 			}
 			break;
 		}
-		case PL_SOCKET_RV_DISCONNETED:
-			if(PL_SOCKET_RV_ERROR != pl_socket_reconnect(&_stream_thread_data->pl_socket_stream,
+		case ABSL_SOCKET_RV_DISCONNETED:
+			if(ABSL_SOCKET_RV_ERROR != absl_socket_reconnect(&_stream_thread_data->absl_socket_stream,
 														  _stream_config.ip, _stream_config.port))
 			{
 				reconnect_timeout = false;
-				pl_timer_start(&timer_reconnect_timeout);
+				absl_timer_start(&timer_reconnect_timeout);
 			}
 			else
 			{
 				streaming_task_notify_system_event(_stream_thread_config->event_info_array, ST_EVENTS_COULD_NOT_RECONNECT_TCP);
 			}
 			break;
-		case PL_SOCKET_RV_CONNECTING:
+		case ABSL_SOCKET_RV_CONNECTING:
 			if(true == reconnect_timeout)
 			{
-				pl_socket_tcp_close(&_stream_thread_data->pl_socket_stream);
+				absl_socket_tcp_close(&_stream_thread_data->absl_socket_stream);
 				streaming_task_notify_system_event(_stream_thread_config->event_info_array, ST_EVENTS_COULD_NOT_CONNECT_TCP);
 			}
 			break;
-		case PL_SOCKET_RV_CLOSING:
-			pl_socket_tcp_close(&_stream_thread_data->pl_socket_stream);
+		case ABSL_SOCKET_RV_CLOSING:
+			absl_socket_tcp_close(&_stream_thread_data->absl_socket_stream);
 			break;
 		default:
 			break;

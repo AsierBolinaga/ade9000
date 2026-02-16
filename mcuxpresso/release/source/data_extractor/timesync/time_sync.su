@@ -1,0 +1,3 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/timesync/time_sync.c:31:6:time_sync_timeout	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/timesync/time_sync.c:37:6:time_sync_initialize	56	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/timesync/time_sync.c:69:6:time_sync_task	72	static

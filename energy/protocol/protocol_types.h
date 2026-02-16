@@ -8,7 +8,7 @@
 #ifndef PROTOCOL_TYPES_H_
 #define PROTOCOL_TYPES_H_
 
-#include "pl_types.h"
+#include "absl_types.h"
 
 #define ALERT_LEVEL_WARNING			"warning"
 #define ALERT_LEVEL_INFO			"info"

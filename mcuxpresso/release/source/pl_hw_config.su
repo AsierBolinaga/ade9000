@@ -1,0 +1,9 @@
+../source/absl_hw_config.c:51:18:absl_config_get_spi_conf	0	static
+../source/absl_hw_config.c:106:6:absl_hw_config_assign_phy_mac	0	static
+../source/absl_hw_config.c:135:25:absl_config_get_enet_event_conf	0	static
+../source/absl_hw_config.c:172:21:absl_config_get_socket_conf	0	static
+../source/absl_hw_config.c:195:19:absl_config_get_mqtt_conf	0	static
+../source/absl_hw_config.c:226:18:absl_config_get_nvm_conf	0	static
+../source/absl_hw_config.c:286:19:absl_config_get_gpio_conf	0	static
+../source/absl_hw_config.c:306:23:absl_config_get_wdog_conf	0	static
+../source/absl_hw_config.c:330:18:absl_config_get_ntp_conf	0	static

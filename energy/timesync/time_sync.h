@@ -8,8 +8,8 @@
 #ifndef TIMESYNC_TIME_SYNC_H_
 #define TIMESYNC_TIME_SYNC_H_
 
-#include "pl_types.h"
-#include "pl_event.h"
+#include "absl_types.h"
+#include "absl_event.h"
 
 #define TIMESYNC_SYNC_MSG	0x00000001
 #define TIMESYNC_DO_SYNC	0x00000002
@@ -32,8 +32,8 @@ typedef enum time_sync_events
 typedef struct time_sync_thread_config
 {
 	uint8_t			tyme_sync_ntp_index;
-	pl_event_t*		time_sync_events;
-	pl_event_t*		system_events;
+	absl_event_t*		time_sync_events;
+	absl_event_t*		system_events;
 	uint32_t		sync_process_finished;
 	void* 			event_info_array;
 	bool			time_sync_initialized;

@@ -12,10 +12,10 @@
 #include "protocol_types.h"
 #include "time_sync_types.h"
 
-#include "pl_types.h"
-#include "pl_time.h"
-#include "pl_event.h"
-#include "pl_queue.h"
+#include "absl_types.h"
+#include "absl_time.h"
+#include "absl_event.h"
+#include "absl_queue.h"
 
 #define SYSTEM_MODEL	"energy"
 

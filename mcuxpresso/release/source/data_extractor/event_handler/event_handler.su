@@ -1,0 +1,4 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/event_handler/event_handler.c:48:6:event_handler_init	4	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/event_handler/event_handler.c:63:22:event_handler_new_event_code	176	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/event_handler/event_handler.c:187:15:event_handler_get_error_codes	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/data_extractor/event_handler/event_handler.c:217:6:event_handler_notify_system_event	8	static

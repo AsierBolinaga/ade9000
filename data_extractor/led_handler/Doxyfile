@@ -1,0 +1,42 @@
+# Doxyfile 1.9.2
+
+# Project-related configuration
+PROJECT_NAME           = "LED Handler"
+PROJECT_BRIEF          = "Module responsible for managing the system's status LED through blinking patterns."
+PROJECT_LOGO           = ""
+OUTPUT_DIRECTORY       = docs
+CREATE_SUBDIRS         = YES
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+EXTRACT_LOCAL_CLASSES  = YES
+EXTRACT_LOCAL_METHODS  = YES
+RECURSIVE              = YES
+
+# Input settings
+INPUT                  = .
+FILE_PATTERNS          = *.c *.h
+INPUT_ENCODING         = UTF-8
+RECURSIVE              = YES
+
+# Documentation settings
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+HTML_OUTPUT            = html
+LATEX_OUTPUT           = latex
+BRIEF_MEMBER_DESC      = YES
+INLINE_INHERITED_MEMBERS = YES
+INLINE_INFO            = YES
+STRIP_CODE_COMMENTS    = NO
+
+# Markdown support
+MARKDOWN_SUPPORT       = YES
+
+# Output options
+GENERATE_TREEVIEW      = YES
+GENERATE_DOCSET        = NO
+
+# Miscellaneous
+CASE_SENSITIVITY       = YES
+DISABLE_INDEX          = NO
+DISABLE_SEARCH         = NO

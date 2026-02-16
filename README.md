@@ -329,5 +329,5 @@ Watchdog: Module responsible for the system watchdog.
 
 This is the firmware’s abstraction layer. The **ADE9000 Data Extractor** firmware should not require any changes if the operating system or microcontroller changes, as long as everything required for the new platform is implemented in th abstraction layer. If not, the missing parts must be implemented in abstraction layer, but the firmware should remain unchanged.
 
-The only project-dependent parts that would change are the abstraction layer configuration files: **pl_config.h** and **pl_hw_config.c/h**.
+The only project-dependent parts that would change are the abstraction layer configuration files: **absl_config.h** and **absl_hw_config.c/h**.
 

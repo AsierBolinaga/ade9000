@@ -1,11 +1,11 @@
 
 #include "watchdog.h"
 
-#include "pl_system.h"
-#include "pl_hw_config.h"
-#include "pl_watchdog.h"
-#include "pl_debug.h"
-#include "pl_thread.h"
+#include "absl_system.h"
+#include "absl_hw_config.h"
+#include "absl_watchdog.h"
+#include "absl_debug.h"
+#include "absl_thread.h"
 
 /*******************************************************************************
  * Definitions
@@ -20,8 +20,8 @@
  ******************************************************************************/
 static watchdog_config_t* wdog_config;
 
-static pl_watchdog_t			pl_wdog;
-static pl_watchdog_config_t * 	pl_wdog_config;
+static absl_watchdog_t			absl_wdog;
+static absl_watchdog_config_t * 	absl_wdog_config;
 
 /*******************************************************************************
  * Code
@@ -34,13 +34,13 @@ bool watchdog_init(watchdog_config_t* _wdog_config)
 	{
 		wdog_config = _wdog_config;
 
-		pl_wdog_config = pl_config_get_wdog_conf(wdog_config->wdog_index);
+		absl_wdog_config = absl_config_get_wdog_conf(wdog_config->wdog_index);
 
-		if(PL_WATCHDOG_OK == pl_watchdog_init(&pl_wdog, pl_wdog_config))
+		if(ABSL_WATCHDOG_OK == absl_watchdog_init(&absl_wdog, absl_wdog_config))
 		{
 			wdog_config->initialized = true;
 			return_value = true;
-			pl_debug_printf("--- wdog Init done---\r\n");
+			absl_debug_printf("--- wdog Init done---\r\n");
 		}
 	}
 
@@ -51,11 +51,11 @@ void watchdog_run(void)
 {
     if(!wdog_config->initialized)
     {
-    	pl_debug_printf("watchdog module not initialized!\n");
-		pl_hardfault_handler(WDOG_NOT_INIT_ERROR);
+    	absl_debug_printf("watchdog module not initialized!\n");
+		absl_hardfault_handler(WDOG_NOT_INIT_ERROR);
     }
 
-	pl_watchdog_run(&pl_wdog);
+	absl_watchdog_run(&absl_wdog);
 }
 
 void watchdog_disable(void)
@@ -65,8 +65,8 @@ void watchdog_disable(void)
 
 void watchdog_reset(void)
 {
-	pl_debug_printf("watchdog software reset triggered!\n");
-	pl_thread_sleep(500);
-	pl_watchdog_sw_reset(&pl_wdog);
+	absl_debug_printf("watchdog software reset triggered!\n");
+	absl_thread_sleep(500);
+	absl_watchdog_sw_reset(&absl_wdog);
 }
 

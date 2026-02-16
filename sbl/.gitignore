@@ -1,0 +1,6 @@
+*.pyc
+*.o
+*.bin
+*.elf
+*.map
+target/evkmimxrt1060/.sconsign.dblite

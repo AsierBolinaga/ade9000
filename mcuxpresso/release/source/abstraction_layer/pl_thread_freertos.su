@@ -1,0 +1,6 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_thread_freertos.c:12:13:absl_thread_cb	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_thread_freertos.c:19:6:absl_thread_run_freertos	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_thread_freertos.c:24:6:absl_thread_sleep_freertos	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_thread_freertos.c:29:16:absl_thread_create_freertos	16	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_thread_freertos.c:51:6:absl_thread_delete_freertos	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/abstraction_layer/absl_thread_freertos.c:56:6:absl_thread_actual_delete_freertos	0	static

@@ -1,0 +1,5 @@
+../source/components/mdio_phydp83825.c:33:17:MDIO_ExtendedWrite	16	static
+../source/components/mdio_phydp83825.c:38:17:MDIO_ExtendedRead	16	static
+../source/components/mdio_phydp83825.c:23:17:MDIO_Write	0	static
+../source/components/mdio_phydp83825.c:28:17:MDIO_Read	0	static
+../source/components/mdio_phydp83825.c:43:6:mdio_phydp83825_init	8	static

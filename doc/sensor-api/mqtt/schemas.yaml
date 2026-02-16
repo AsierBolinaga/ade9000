@@ -1,0 +1,6 @@
+sensors:
+  oneOf:
+    - $ref: './remote-sensor-schemas/ade9000/schemas.yaml#/sensor'
+services:
+  oneOf:
+    - $ref: './remote-sensor-schemas/ade9000/schemas.yaml#/service'

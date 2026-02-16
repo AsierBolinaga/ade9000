@@ -1,0 +1,5 @@
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/drivers/fsl_tempmon.c:53:6:TEMPMON_Init	16	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/drivers/fsl_tempmon.c:92:6:TEMPMON_Deinit	0	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/drivers/fsl_tempmon.c:109:6:TEMPMON_GetDefaultConfig	8	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/drivers/fsl_tempmon.c:132:7:TEMPMON_GetCurrentTemperature	8	static
+/home/abolinaga/OneDrive/Shared Folder/repo/ade9000/platform/imxrt1062/drivers/fsl_tempmon.c:160:6:TEMPMON_SetTempAlarm	16	static

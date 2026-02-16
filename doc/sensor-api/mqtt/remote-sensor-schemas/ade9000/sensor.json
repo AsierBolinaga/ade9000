@@ -1,0 +1,259 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "ADE9000",
+    "type": "object",
+    "properties": {
+        "tc_primary_side": {
+            "description": "Primary side transformation coefficient. Defines the conversion factor applied to the DuT externally, so that the produced signal complies with the limits established for our sensor design.",
+            "type": "integer",
+            "title": "Tc primary side"
+        },
+        "tc_secondary_side": {
+            "description": "Secondary side transformation coefficient. Defines the conversion factor applied to the signal fed to our sensor so that it complies with the limits established by the internal sensor chip.",
+            "type": "integer",
+            "title": "Tc secondary side"
+        },
+        "fundamental_frequency": {
+            "description": "Fundamental Frequency. Use this field to configure the IC for a 50 Hz or 60 Hz system. This setting is used in the fundamental power measurements and to set the default line period used for VRMS1/2, 10 cyucle rms / 12 cycle rms and resampling calculations if a zero crossing is not present.",
+            "type": "integer",
+            "default": 50,
+            "enum": [50, 60],
+            "title": "Fundamental frequency"
+        },
+        "high_pass_filter_disable": {
+            "description": "Disable the high pass filters in all the voltage and current channels. For use only in devices that have the required hardware modifications.",
+            "type": "boolean",
+            "default": false,
+            "title": "High pass filter disable"
+        },
+        "hw_config": {
+            "description": "Select the type of circuit being measured on the DuT (Delta/Wye)",
+            "type": "string",
+            "oneOf": [
+                {
+                    "const": "3-Wire 1PH Neutral",
+                    "description": "VCONSEL: 000"
+                },
+                {
+                    "const": "3-Wire Network Neutral",
+                    "description": "VCONSEL: 000"
+                },
+                {
+                    "const": "4-Wire Delta Neutral",
+                    "description": "VCONSEL: 000"
+                },
+                {
+                    "const": "4-Wire Wye Isolated",
+                    "description": "VCONSEL: 000"
+                },
+                {
+                    "const": "4-Wire Wye Neutral",
+                    "description": "VCONSEL: 000"
+                },
+                {
+                    "const": "Multiple 1PH Circuits Neutral",
+                    "description": "VCONSEL: 000"
+                },
+                {
+                    "const": "3-Wire Delta Isolated vb",
+                    "description": "VCONSEL: 001"
+                },
+                {
+                    "const": "3-Wire Delta Phase B",
+                    "description": "VCONSEL: 001"
+                },
+                {
+                    "const": "4-Wire Wye, Non-Blondel Compliant Neutral",
+                    "description": "VCONSEL: 010"
+                },
+                {
+                    "const": "4-Wire Delta, Non-Blondel Compliant Neutral",
+                    "description": "VCONSEL: 011"
+                },
+                {
+                    "const": "3-Wire Delta Isolated va vb vc",
+                    "description": "VCONSEL: 100"
+                }
+            ],
+            "title": "Hw config"
+        },
+        "adc_redirect": {
+            "title": "ADC Redirect",
+            "description": "Allows to redirect any ADC to any digital processing datapath.",
+            "type": "object",
+            "properties": {
+                "ia_din": {
+                    "title": "IA DIN",
+                    "$ref": "#/definitions/AdcRedirectI"
+                },
+                "ib_din": {
+                    "title": "IB DIN",
+                    "$ref": "#/definitions/AdcRedirectI"
+                },
+                "ic_din": {
+                    "title": "IC DIN",
+                    "$ref": "#/definitions/AdcRedirectI"
+                },
+                "va_din": {
+                    "title": "VA DIN",
+                    "$ref": "#/definitions/AdcRedirectV"
+                },
+                "vb_din": {
+                    "title": "VB DIN",
+                    "$ref": "#/definitions/AdcRedirectV"
+                },
+                "vc_din": {
+                    "title": "VC DIN",
+                    "$ref": "#/definitions/AdcRedirectV"
+                }
+            },
+            "required": [
+                "vc_din",
+                "vb_din",
+                "va_din",
+                "ic_din",
+                "ib_din",
+                "ia_din"
+            ]
+        },
+        "reverse_direction": {
+            "title": "Reverse direction",
+            "description": "Allows to invert the current channel direction in case the current  sensor was installed backwards.",
+            "type": "object",
+            "properties": {
+                "a": {
+                    "title": "A",
+                    "type": "boolean",
+                    "default": false
+                },
+                "b": {
+                    "title": "B",
+                    "type": "boolean",
+                    "default": false
+                },
+                "c": {
+                    "title": "C",
+                    "type": "boolean",
+                    "default": false
+                }
+            },
+            "required": ["a", "b", "c"]
+        },
+        "gain": {
+            "title": "Gain",
+            "description": "Allows to modify the gain of the variables.",
+            "type": "object",
+            "properties": {
+                "va": {
+                    "title": "VA",
+                    "type": "number",
+                    "default": 1
+                },
+                "vb": {
+                    "title": "VB",
+                    "type": "number",
+                    "default": 1
+                },
+                "vc": {
+                    "title": "VC",
+                    "type": "number",
+                    "default": 1
+                },
+                "ia": {
+                    "title": "IA",
+                    "type": "number",
+                    "default": 1
+                },
+                "ib": {
+                    "title": "IB",
+                    "type": "number",
+                    "default": 1
+                },
+                "ic": {
+                    "title": "IC",
+                    "type": "number",
+                    "default": 1
+                }
+            },
+            "required": ["va", "vb", "vc", "ia", "ib", "ic"]
+        },
+        "thresholds": {
+            "title": "Thresholds",
+            "type": "object",
+            "properties": {
+                "oi": {
+                    "type": "integer",
+                    "default": 1,
+                    "title": "OI threshold (A)"
+                },
+                "dip": {
+                    "type": "integer",
+                    "default": 220,
+                    "title": "Dip threshold (V)"
+                },
+                "swell": {
+                    "type": "integer",
+                    "default": 240,
+                    "title": "Swell threshold (V)"
+                }
+            },
+            "required": ["dip", "oi", "swell"]
+        }
+    },
+    "required": [
+        "tc_primary_side",
+        "tc_secondary_side",
+        "fundamental_frequency",
+        "high_pass_filter_disable",
+        "hw_config",
+        "adc_redirect",
+        "negative_gain",
+        "thresholds"
+    ],
+    "definitions": {
+        "AdcRedirectI": {
+            "default": 7,
+            "type": "number",
+            "oneOf": [
+                {
+                    "title": "IA ADC",
+                    "const": 0
+                },
+                {
+                    "title": "IB ADC",
+                    "const": 1
+                },
+                {
+                    "title": "IC ADC",
+                    "const": 2
+                },
+                {
+                    "title": "(DEFAULT)",
+                    "const": 7
+                }
+            ]
+        },
+        "AdcRedirectV": {
+            "default": 7,
+            "type": "number",
+            "oneOf": [
+                {
+                    "title": "VA ADC",
+                    "const": 4
+                },
+                {
+                    "title": "VB ADC",
+                    "const": 5
+                },
+                {
+                    "title": "VC ADC",
+                    "const": 6
+                },
+                {
+                    "title": "(DEFAULT)",
+                    "const": 7
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,18 @@
+{
+    "repos":
+    [
+        {
+            "urls":
+            [
+                "git@gitlab.internal.ainguraiiot.com:sw/remote_sensing/ade9000.git"
+            ],
+            "paths":
+            [
+                {
+                    "path": "energy_freerun/protocol",
+                    "srcrev": "ab19dd30981f5760986e9c82aeb2f3d8d1037aab"
+                }
+            ]
+        }
+    ] 
+}

@@ -155,10 +155,10 @@ standard names. */
 #define xPortPendSVHandler PendSV_Handler
 #define xPortSysTickHandler SysTick_Handler
 
-extern void pl_system_configure_timer_for_runtime_stats_freertos( void );
-#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()   pl_system_configure_timer_for_runtime_stats_freertos()
+extern void absl_system_configure_timer_for_runtime_stats_freertos( void );
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()   absl_system_configure_timer_for_runtime_stats_freertos()
 
-extern unsigned long pl_get_runtime_counter_value_freertos( void );
-#define portGET_RUN_TIME_COUNTER_VALUE()  pl_get_runtime_counter_value_freertos()
+extern unsigned long absl_get_runtime_counter_value_freertos( void );
+#define portGET_RUN_TIME_COUNTER_VALUE()  absl_get_runtime_counter_value_freertos()
 
 #endif /* FREERTOS_CONFIG_H */

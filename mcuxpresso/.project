@@ -31,24 +31,24 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>source/abstraction_layer</name>
+			<type>2</type>
+			<locationURI>PARENT-1-PROJECT_LOC/portability_layer</locationURI>
+		</link>
+		<link>
 			<name>source/cJSON</name>
 			<type>2</type>
 			<locationURI>PARENT-1-PROJECT_LOC/cJSON</locationURI>
 		</link>
 		<link>
-			<name>source/energy_freerun</name>
+			<name>source/data_extractor</name>
 			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/energy_freerun</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/data_extractor</locationURI>
 		</link>
 		<link>
 			<name>source/platform</name>
 			<type>2</type>
 			<locationURI>PARENT-1-PROJECT_LOC/platform</locationURI>
-		</link>
-		<link>
-			<name>source/portability_layer</name>
-			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/portability_layer</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
